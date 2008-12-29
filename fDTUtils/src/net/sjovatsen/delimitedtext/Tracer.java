@@ -8,7 +8,7 @@ package net.sjovatsen.delimitedtext;
  * @author fsjovatsen
  * @version 1.0.0
  */
-public interface fTracer {
+public interface Tracer {
 
     /**
      * This method should output a the parameter string to what ever you want

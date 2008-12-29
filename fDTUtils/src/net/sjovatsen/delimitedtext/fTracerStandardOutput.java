@@ -1,13 +1,13 @@
 package net.sjovatsen.delimitedtext;
 
 /**
- *  This class implements the fTracer interface. It traces to standard output.
+ *  This class implements the Tracer interface. It traces to standard output.
  * 
  * @author fsjovatsen
  * @version 1.0.0
- * @see fTracer
+ * @see Tracer
  */
-public class fTracerStandardOutput implements fTracer {
+public class fTracerStandardOutput implements Tracer {
     
     public fTracerStandardOutput() {
         

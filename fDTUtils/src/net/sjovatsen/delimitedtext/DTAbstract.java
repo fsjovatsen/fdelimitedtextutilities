@@ -27,7 +27,7 @@ public abstract class DTAbstract {
     protected String _delimiter;
     protected TRACE _trace;
     protected int _minRowCount;
-    protected fTracer _tracer;
+    protected Tracer _tracer;
 
    /**
      * Class constructor.
@@ -168,10 +168,10 @@ public abstract class DTAbstract {
     /**
      * Sets a tracer object.
      * 
-     * @param _tracer   fTracer object.
-     * @see fTracer
+     * @param _tracer   Tracer object.
+     * @see Tracer
      */
-    public void setTracer(fTracer _tracer) {
+    public void setTracer(Tracer _tracer) {
         this._tracer = _tracer;
     }
 }
