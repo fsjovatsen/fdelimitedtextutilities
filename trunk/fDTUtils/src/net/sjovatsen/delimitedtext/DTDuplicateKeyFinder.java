@@ -1,7 +1,24 @@
+/*
+    This file is part of fDTUtils.
+
+    fDTUtils is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Foobar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.sjovatsen.delimitedtext;
 
 /**
- * This class finds if a delimited file has duplicate rows based on a key.
+ * This class finds if a delimited dupsFile has duplicate rows based on a key.
  * 
  * @author fsjovatsen
  * @version 1.0.0
@@ -15,13 +32,11 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-
+//import java.util.Collections;
 public class DTDuplicateKeyFinder extends DTAbstract {
 
-    private File file;
-    //private String[] _duplicates;
-    //private int key;
+    private File dupsFile = null;
+
     /**
      * The default class constructor.
      */
@@ -31,11 +46,11 @@ public class DTDuplicateKeyFinder extends DTAbstract {
     /**
      * The class constructor.
      * 
-     * @param file The file to search.
+     * @param dupsFile The file to search for duplicates in.
      */
     public DTDuplicateKeyFinder(File file) {
         if (file != null) {
-            this.file = file;
+            this.dupsFile = file;
         }
     }
 
@@ -50,7 +65,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
         try {
             ArrayList<String> dups = new ArrayList<String>();
-            BufferedReader file = new BufferedReader(new FileReader(this.file));
+            BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
             ArrayList<String> al1 = new ArrayList<String>();
             String[] lineArray1 = null;
             String line = null;
@@ -64,7 +79,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             this.startTime = System.currentTimeMillis();
 
             /*
-             * Reading the file into a array.
+             * Reading the dupsFile into a array.
              */
             while ((line = file.readLine()) != null) {
                 lineArray1 = line.split(this.delimiter);
@@ -85,6 +100,10 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             message(" The search took " + formatElapsedTime() + " to finish.");
             message(" Records searched " + searchedRecords);
             message(" Duplicate count " + dups.size());
+            trace(" The duplcates are:");
+            for (String l : dups) {
+                trace("  " + l);
+            }
             message("--------------------------------------------------");
 
             return dups;
@@ -103,7 +122,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 //        try {
 //            ArrayList<String> al = new ArrayList<String>();
 //            //ArrayList<int> dupsFoundIndex = new ArrayList<int>();
-//            BufferedReader file = new BufferedReader(new FileReader(file));
+//            BufferedReader dupsFile = new BufferedReader(new FileReader(dupsFile));
 //            ArrayList<String> al1 = new ArrayList<String>();
 //            ArrayList<String> al2 = new ArrayList<String>();
 //            String[] lineArray1 = null;
@@ -113,15 +132,15 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 //            String line = null;
 //
 //            /*
-//             * Reading the file into a array.
+//             * Reading the dupsFile into a array.
 //             */
-//            while ((line = file.readLine()) != null) {
+//            while ((line = dupsFile.readLine()) != null) {
 //                al1.add(line);
 //            }
-////            while ((line = file.readLine()) != null) {
+////            while ((line = dupsFile.readLine()) != null) {
 ////                al2.add(line);
 ////            }
-//            file.close();
+//            dupsFile.close();
 //            al2 = al1;
 //
 //            for (String line1 : al1) {
@@ -153,7 +172,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 //
 //    }
     /**
-     * Search the file for duplicate keys and returns on the first one found.
+     * Search the dupsFile for duplicate keys and returns on the first one found.
      * 
      * @return  true if found, false if not found.
      * 
@@ -163,7 +182,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
         try {
 
-            BufferedReader file = new BufferedReader(new FileReader(this.file));
+            BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
             ArrayList<String> al1 = new ArrayList<String>();
             String[] lineArray1 = null;
             boolean bMatchedKey = false;
@@ -179,7 +198,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             this.startTime = System.currentTimeMillis();
 
             /*
-             * Reading the file into a array.
+             * Reading the dupsFile into a array.
              */
             while ((line = file.readLine()) != null) {
                 lineArray1 = line.split(this.delimiter);
@@ -206,6 +225,8 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             message(" File count " + recordCount);
             if (bMatchedKey) {
                 message(" Records searched before duplicate found " + searchedRecords);
+            } else {
+                message(" No duplicates found.");
             }
             message("--------------------------------------------------");
 
@@ -221,14 +242,14 @@ public class DTDuplicateKeyFinder extends DTAbstract {
     }
 
     /**
-     * Sets the file to check.
+     * Sets the dupsFile to check.
      * 
-     * @param file  File to check.
+     * @param dupsFile  File to check.
      * @see #fDuplicateKeyFinder(File)
      */
     public void setFile(File file) {
         if (file != null) {
-            this.file = file;
+            this.dupsFile = file;
         }
     }
 }

@@ -1,3 +1,20 @@
+/*
+    This file is part of fDTUtils.
+
+    fDTUtils is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Foobar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.sjovatsen.delimitedtext;
 
 import java.text.SimpleDateFormat;
@@ -8,7 +25,7 @@ import java.util.TimeZone;
  * This is the abstract class for all the fDT* classes. 
  * It provides some data for:
  * <ul>
- *  <li>time messering
+ *  <li>time measuring 
  *  <li>parsing a delimited record
  *  <li>datastructures performance
  *  <li>tracing the build
@@ -156,7 +173,7 @@ public abstract class DTAbstract {
     }
 /**
  * Sets how big the ArrayList structures should initialy be. If the value is
- * greater than 0 it sets the ensureCapacity() on the ArrayList.
+ * greater than 0 it sets the <code>ensureCapacity()</code> on the ArrayList.
  *  
  * @param minRowCount Value to pass to ensureCapacity()
  * @see java.util.ArrayList#ensureCapacity(int) 
