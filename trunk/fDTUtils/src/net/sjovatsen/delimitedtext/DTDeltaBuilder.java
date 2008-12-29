@@ -25,60 +25,60 @@ import java.util.TimeZone;
 
 public class DTDeltaBuilder extends DTAbstract {
 
-    private File _ndf;
-    private File _odf;
-    private File _nif;
+    private File ndFile;
+    private File odFile;
+    private File niFile;
 
     /**
      * Class constructor.
      */
     public DTDeltaBuilder() {
-        this._ndf = null;
-        this._odf = null;
-        this._nif = null;
-        this._key = 0;
-        this._trace = TRACE.DEFAULT;
-        this._delimiter = ",";
-        this._minRowCount = 0;
-        this._tracer = null;
+        this.ndFile = null;
+        this.odFile = null;
+        this.niFile = null;
+        this.key = 0;
+        this.trace = TRACE.DEFAULT;
+        this.delimiter = ",";
+        this.minRowCount = 0;
+        this.tracer = null;
     }
 
     /**
      * Class constructor specifying files for delta building.
      * 
-     * @param ndf   New data file.
-     * @param odf   Old data file.
-     * @param nif   New input file.
+     * @param ndFile   New data file.
+     * @param odFile   Old data file.
+     * @param niFile   New input file.
      */
     public DTDeltaBuilder(File ndf, File odf, File nif) {
-        this._ndf = ndf;
-        this._odf = odf;
-        this._nif = nif;
-        this._key = 0;
-        this._trace = TRACE.DEFAULT;
-        this._minRowCount = 0;
-        this._trace = TRACE.DEFAULT;
-        this._tracer = null;
+        this.ndFile = ndf;
+        this.odFile = odf;
+        this.niFile = nif;
+        this.key = 0;
+        this.trace = TRACE.DEFAULT;
+        this.minRowCount = 0;
+        this.trace = TRACE.DEFAULT;
+        this.tracer = null;
     }
 
     /**
      * Class constructor specifying files for delta building.
      * 
-     * @param ndf   New data file.
-     * @param odf   Old data file.
-     * @param nif   New input file.
+     * @param ndFile   New data file.
+     * @param odFile   Old data file.
+     * @param niFile   New input file.
      * @param key   Index of the key in a record.
      * @param delimiter Char that separates the fields in a record.
      */
     public DTDeltaBuilder(File ndf, File odf, File nif, int key, String delimiter) {
-        this._ndf = ndf;
-        this._odf = odf;
-        this._nif = nif;
-        this._key = key;
-        this._delimiter = delimiter;
-        this._minRowCount = 0;
-        this._trace = TRACE.DEFAULT;
-        this._tracer = null;
+        this.ndFile = ndf;
+        this.odFile = odf;
+        this.niFile = nif;
+        this.key = key;
+        this.delimiter = delimiter;
+        this.minRowCount = 0;
+        this.trace = TRACE.DEFAULT;
+        this.tracer = null;
     }
 
     /**
@@ -93,9 +93,9 @@ public class DTDeltaBuilder extends DTAbstract {
     public void buildDeltaFile() {
 
         try {
-            BufferedReader ndfFile = new BufferedReader(new FileReader(_ndf));
-            BufferedReader odfFile = new BufferedReader(new FileReader(_odf));
-            PrintWriter nifFile = new PrintWriter(new FileWriter(_nif));
+            BufferedReader ndfFile = new BufferedReader(new FileReader(ndFile));
+            BufferedReader odfFile = new BufferedReader(new FileReader(odFile));
+            PrintWriter nifFile = new PrintWriter(new FileWriter(niFile));
             String ndfLine = null;
             String[] ndfLineArray = null;
             String odfLine = null;
@@ -120,13 +120,13 @@ public class DTDeltaBuilder extends DTAbstract {
             /* 
              * I wonder how much time this takes?
              */
-            _startTime = System.currentTimeMillis();
+            this.startTime = System.currentTimeMillis();
 
             /*
              * Reading the ODF into a array.
              */
-            if (_minRowCount > 0) {
-                odfArrayList.ensureCapacity(_minRowCount);
+            if (this.minRowCount > 0) {
+                odfArrayList.ensureCapacity(this.minRowCount);
             }
             while ((odfLine = odfFile.readLine()) != null) {
                 odfArrayList.add(odfLine);
@@ -138,8 +138,8 @@ public class DTDeltaBuilder extends DTAbstract {
             /*
              * Reading the NDF into a array.
              */
-            if (_minRowCount > 0) {
-                ndfArrayList.ensureCapacity(_minRowCount);
+            if (this.minRowCount > 0) {
+                ndfArrayList.ensureCapacity(this.minRowCount);
             }
             while ((ndfLine = ndfFile.readLine()) != null) {
                 ndfArrayList.add(ndfLine);
@@ -161,7 +161,7 @@ public class DTDeltaBuilder extends DTAbstract {
                 for (String lineODFList : odfArrayList) {
                     odfLine = lineODFList;
                     odfLineArray = odfLine.split(",");
-                    if (ndfLineArray[_key].equals(odfLineArray[_key])) {
+                    if (ndfLineArray[this.key].equals(odfLineArray[this.key])) {
                         bMatchedKey = true;
                         break;
                     }
@@ -170,7 +170,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
                 if (bMatchedKey) { /* The record exits in both NDF and ODF */
                     odfArrayList.remove(i);
-                    trace("The key (" + ndfLineArray[_key] + ") was found i both NDF and ODF. Now we need to check if the whole record matches");
+                    trace("The key (" + ndfLineArray[this.key] + ") was found i both NDF and ODF. Now we need to check if the whole record matches");
 
                     if (ndfLine.equals(odfLine)) {
                         trace("The record was equal. Skipping this record in NIF.");
@@ -182,7 +182,7 @@ public class DTDeltaBuilder extends DTAbstract {
                     }
                     bMatchedKey = false;
                 } else { /* The record was found in NDF but not in ODF */
-                    trace("The key (" + ndfLineArray[_key] + ") was not found i both NDF and ODF. This is a ADD");
+                    trace("The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
                     iADDCount++;
                     iNIFCount++;
                     nifFile.println("ADD," + ndfLine);
@@ -202,17 +202,17 @@ public class DTDeltaBuilder extends DTAbstract {
                 for (String lineNDFList : ndfArrayList) {
                     ndfLine = lineNDFList;
                     ndfLineArray = ndfLine.split(",");
-                    if (odfLineArray[_key].equals(ndfLineArray[_key])) {
+                    if (odfLineArray[this.key].equals(ndfLineArray[this.key])) {
                         bMatchedKey = true;
                         break;
                     }
                 }
 
                 if (bMatchedKey) {
-                    trace("The key (" + ndfLineArray[_key] + ") was found i both ODF and NDF. We should keep this user.");
+                    trace("The key (" + ndfLineArray[this.key] + ") was found i both ODF and NDF. We should keep this user.");
                     bMatchedKey = false;
                 } else {
-                    trace("The key (" + ndfLineArray[_key] + ") was not found in NDF but is in ODF. This is a DELETE.");
+                    trace("The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
                     iDELETECount++;
                     iNIFCount++;
                     nifFile.println("DELETE," + odfLine);
@@ -222,7 +222,7 @@ public class DTDeltaBuilder extends DTAbstract {
             /*
              * Now I can tell you how much time this took.
              */
-            //_currentTime = System.currentTimeMillis();
+            //currentTime = System.currentTimeMillis();
             //dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
             /*
@@ -255,27 +255,27 @@ public class DTDeltaBuilder extends DTAbstract {
     /**
      * Sets the new data file.
      * 
-     * @param _ndf
+     * @param ndFile
      */
     public void setNDF(File _ndf) {
-        this._ndf = _ndf;
+        this.ndFile = _ndf;
     }
 
     /**
      * Sets the new input file.
      * 
-     * @param _nif
+     * @param niFile
      */
     public void setNIF(File _nif) {
-        this._nif = _nif;
+        this.niFile = _nif;
     }
 
     /**
      * Sets the old data file.
      * 
-     * @param _odf
+     * @param odFile
      */
     public void setODF(File _odf) {
-        this._odf = _odf;
+        this.odFile = _odf;
     }
 }

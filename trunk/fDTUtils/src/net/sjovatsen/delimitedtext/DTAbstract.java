@@ -21,25 +21,25 @@ import java.util.TimeZone;
  */
 public abstract class DTAbstract {
 
-    protected long _startTime;
-    protected long _currentTime;
-    protected int _key;
-    protected String _delimiter;
-    protected TRACE _trace;
-    protected int _minRowCount;
-    protected Tracer _tracer;
+    protected long startTime;
+    protected long currentTime;
+    protected int key;
+    protected String delimiter;
+    protected TRACE trace;
+    protected int minRowCount;
+    protected Tracer tracer;
 
    /**
      * Class constructor.
      */
     public DTAbstract() {
-        this._startTime = 0;
-        this._currentTime = 0;
-        this._key = 0;
-        this._delimiter = ",";
-        this._trace = TRACE.DEFAULT;
-        this._tracer = null;
-        this._minRowCount = 0;
+        this.startTime = 0;
+        this.currentTime = 0;
+        this.key = 0;
+        this.delimiter = ",";
+        this.trace = TRACE.DEFAULT;
+        this.tracer = null;
+        this.minRowCount = 0;
     }
     
      /**
@@ -48,8 +48,8 @@ public abstract class DTAbstract {
      * @param s Message to trace.
      */
     protected void trace(String s) {
-        if ((_trace == TRACE.VERBOSE) && (_tracer != null)) {
-            _tracer.traceMessage(s);
+        if ((this.trace == TRACE.VERBOSE) && (this.tracer != null)) {
+            this.tracer.traceMessage(s);
         }
     }
 
@@ -59,8 +59,8 @@ public abstract class DTAbstract {
      * @param s Message to trace.
      */
     protected void message(String s) {
-        if ((_trace != TRACE.QUIET) && (_tracer != null)) {
-            _tracer.traceMessage(s);
+        if ((this.trace != TRACE.QUIET) && (this.tracer != null)) {
+            this.tracer.traceMessage(s);
         }
     }
     
@@ -80,15 +80,15 @@ public abstract class DTAbstract {
     /**
      * Calculates the time between the start timestamp and the current timestamp.
      * 
-     * @return  Time between _currentTime and _startTime.
+     * @return  Time between currentTime and startTime.
      * 
-     * TODO: Do we need _currentTime?
+     * TODO: Do we need currentTime?
      */
     protected long getElapsedTime() {
     
         long currentTime = System.currentTimeMillis();
         
-        return (currentTime - this._startTime);
+        return (currentTime - this.startTime);
     }
 
     /**
@@ -101,35 +101,35 @@ public abstract class DTAbstract {
      *                  Sjovatsen
      */
     public void setDelimiter(String delimiter) {
-        this._delimiter = delimiter;
+        this.delimiter = delimiter;
     }
 
     /**
      * Gets the delimiter.
      * 
-     * @return  _delimiter
+     * @return  delimiter
      * @see #setDelimiter(java.lang.String) 
      */
     public String getDelimiter() {
-        return _delimiter;
+        return this.delimiter;
     }
 
     /**
      * Gets the index that is the matching key in a record. 
      * 
-     * @return  _key.
-     * @see #setKey(int _key)
+     * @return  key.
+     * @see #setKey(int key)
      */
     public int getKey() {
-        return _key;
+        return this.key;
     }
     
 //    /**
 //     * Gets the start timestamp.
-//     * @return _startTime
+//     * @return startTime
 //     */
 //    public long getStartTime() {
-//        return _startTime;
+//        return startTime;
 //    }
 
     /**
@@ -142,36 +142,36 @@ public abstract class DTAbstract {
      * @param key
      */
     public void setKey(int key) {
-        this._key = key;
+        this.key = key;
     }
 
     /**
      * Sets the level of tracing.
      * 
-     * @param _trace    Trace level.
+     * @param trace    Trace level.
      * @see TRACE
      */
     public void setTrace(TRACE _trace) {
-        this._trace = _trace;
+        this.trace = _trace;
     }
 /**
  * Sets how big the ArrayList structures should initialy be. If the value is
  * greater than 0 it sets the ensureCapacity() on the ArrayList.
  *  
- * @param _minRowCount Value to pass to ensureCapacity()
+ * @param minRowCount Value to pass to ensureCapacity()
  * @see java.util.ArrayList#ensureCapacity(int) 
  */
     public void setMinRowCount(int _minRowCount) {
-        this._minRowCount = _minRowCount;
+        this.minRowCount = _minRowCount;
     }
 
     /**
      * Sets a tracer object.
      * 
-     * @param _tracer   Tracer object.
+     * @param tracer   Tracer object.
      * @see Tracer
      */
     public void setTracer(Tracer _tracer) {
-        this._tracer = _tracer;
+        this.tracer = _tracer;
     }
 }

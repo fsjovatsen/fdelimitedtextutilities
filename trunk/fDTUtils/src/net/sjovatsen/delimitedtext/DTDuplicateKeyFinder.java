@@ -19,9 +19,9 @@ import java.util.Collections;
 
 public class DTDuplicateKeyFinder extends DTAbstract {
 
-    private File _file;
+    private File file;
     //private String[] _duplicates;
-    //private int _key;
+    //private int key;
     /**
      * The default class constructor.
      */
@@ -35,7 +35,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
      */
     public DTDuplicateKeyFinder(File file) {
         if (file != null) {
-            _file = file;
+            this.file = file;
         }
     }
 
@@ -50,7 +50,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
         try {
             ArrayList<String> dups = new ArrayList<String>();
-            BufferedReader file = new BufferedReader(new FileReader(_file));
+            BufferedReader file = new BufferedReader(new FileReader(this.file));
             ArrayList<String> al1 = new ArrayList<String>();
             String[] lineArray1 = null;
             String line = null;
@@ -61,14 +61,14 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             message("--------------------------------------------------");
             message(" Start getting duplicates ...");
 
-            _startTime = System.currentTimeMillis();
+            this.startTime = System.currentTimeMillis();
 
             /*
              * Reading the file into a array.
              */
             while ((line = file.readLine()) != null) {
-                lineArray1 = line.split(_delimiter);
-                al1.add(lineArray1[_key]);
+                lineArray1 = line.split(this.delimiter);
+                al1.add(lineArray1[this.key]);
             }
             file.close();
 
@@ -103,7 +103,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 //        try {
 //            ArrayList<String> al = new ArrayList<String>();
 //            //ArrayList<int> dupsFoundIndex = new ArrayList<int>();
-//            BufferedReader file = new BufferedReader(new FileReader(_file));
+//            BufferedReader file = new BufferedReader(new FileReader(file));
 //            ArrayList<String> al1 = new ArrayList<String>();
 //            ArrayList<String> al2 = new ArrayList<String>();
 //            String[] lineArray1 = null;
@@ -125,10 +125,10 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 //            al2 = al1;
 //
 //            for (String line1 : al1) {
-//                lineArray1 = line1.split(this._delimiter);
+//                lineArray1 = line1.split(this.delimiter);
 //                for (String line2 : al2) {
-//                    lineArray2 = line2.split(this._delimiter);
-//                    if (lineArray1[_key].equals(lineArray2[_key])) {
+//                    lineArray2 = line2.split(this.delimiter);
+//                    if (lineArray1[key].equals(lineArray2[key])) {
 //                        matchedCount++;
 //                    }
 //                }
@@ -163,7 +163,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
         try {
 
-            BufferedReader file = new BufferedReader(new FileReader(_file));
+            BufferedReader file = new BufferedReader(new FileReader(this.file));
             ArrayList<String> al1 = new ArrayList<String>();
             String[] lineArray1 = null;
             boolean bMatchedKey = false;
@@ -176,14 +176,14 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             message("--------------------------------------------------");
             message(" Start searching for duplicates ...");
 
-            _startTime = System.currentTimeMillis();
+            this.startTime = System.currentTimeMillis();
 
             /*
              * Reading the file into a array.
              */
             while ((line = file.readLine()) != null) {
-                lineArray1 = line.split(_delimiter);
-                al1.add(lineArray1[_key]);
+                lineArray1 = line.split(this.delimiter);
+                al1.add(lineArray1[this.key]);
             }
             file.close();
 
@@ -228,7 +228,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
      */
     public void setFile(File file) {
         if (file != null) {
-            _file = file;
+            this.file = file;
         }
     }
 }
