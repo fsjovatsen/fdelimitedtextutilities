@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 
-public class fDTDuplicateKeyFinder extends DTAbstract {
+public class DTDuplicateKeyFinder extends DTAbstract {
 
     private File _file;
     //private String[] _duplicates;
@@ -25,7 +25,7 @@ public class fDTDuplicateKeyFinder extends DTAbstract {
     /**
      * The default class constructor.
      */
-    public fDTDuplicateKeyFinder() {
+    public DTDuplicateKeyFinder() {
     }
 
     /**
@@ -33,7 +33,7 @@ public class fDTDuplicateKeyFinder extends DTAbstract {
      * 
      * @param file The file to search.
      */
-    public fDTDuplicateKeyFinder(File file) {
+    public DTDuplicateKeyFinder(File file) {
         if (file != null) {
             _file = file;
         }
