@@ -19,7 +19,7 @@ import java.util.TimeZone;
  * 
  * TODO: Add methods for formating elapsed time.
  */
-public abstract class fDTAbstract {
+public abstract class DTAbstract {
 
     protected long _startTime;
     protected long _currentTime;
@@ -32,7 +32,7 @@ public abstract class fDTAbstract {
    /**
      * Class constructor.
      */
-    public fDTAbstract() {
+    public DTAbstract() {
         this._startTime = 0;
         this._currentTime = 0;
         this._key = 0;
