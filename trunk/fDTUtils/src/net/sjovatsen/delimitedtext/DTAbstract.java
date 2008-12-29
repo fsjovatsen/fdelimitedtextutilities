@@ -1,20 +1,19 @@
 /*
-    This file is part of fDTUtils.
+This file is part of fDTUtils.
 
-    fDTUtils is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+fDTUtils is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Foobar is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+fDTUtils is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+You should have received a copy of the GNU General Public License
+along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sjovatsen.delimitedtext;
 
 import java.text.SimpleDateFormat;
@@ -28,13 +27,10 @@ import java.util.TimeZone;
  *  <li>time measuring 
  *  <li>parsing a delimited record
  *  <li>datastructures performance
- *  <li>tracing the build
+ *  <li>tracing
  * </ul>
  * 
- * @author fsjovatsen
- * @version 1.0.0
- * 
- * TODO: Add methods for formating elapsed time.
+ * @author Frode Sjovatsen <frode@sjovatsen.net>
  */
 public abstract class DTAbstract {
 
@@ -46,20 +42,20 @@ public abstract class DTAbstract {
     protected int minRowCount;
     protected Tracer tracer;
 
-   /**
+    /**
      * Class constructor.
      */
     public DTAbstract() {
         this.startTime = 0;
-        this.currentTime = 0;
+        //this.currentTime = 0;
         this.key = 0;
         this.delimiter = ",";
         this.trace = TRACE.DEFAULT;
         this.tracer = null;
         this.minRowCount = 0;
     }
-    
-     /**
+
+    /**
      * Sends a verbose message to the tracer.
      * 
      * @param s Message to trace.
@@ -80,31 +76,29 @@ public abstract class DTAbstract {
             this.tracer.traceMessage(s);
         }
     }
-    
+
     /**
      * 
      */
     protected String formatElapsedTime() {
-        
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        
+
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        
+
         return dateFormat.format(new Date(getElapsedTime()));
     }
-            
-    
+
     /**
      * Calculates the time between the start timestamp and the current timestamp.
      * 
-     * @return  Time between currentTime and startTime.
+     * @return  Time between <code>currentTime</code> and <code>startTime</code>.
      * 
-     * TODO: Do we need currentTime?
      */
-    protected long getElapsedTime() {
-    
+    public long getElapsedTime() {
+
         long currentTime = System.currentTimeMillis();
-        
+
         return (currentTime - this.startTime);
     }
 
@@ -124,7 +118,7 @@ public abstract class DTAbstract {
     /**
      * Gets the delimiter.
      * 
-     * @return  delimiter
+     * @return  <code>delimiter</code>
      * @see #setDelimiter(java.lang.String) 
      */
     public String getDelimiter() {
@@ -134,20 +128,22 @@ public abstract class DTAbstract {
     /**
      * Gets the index that is the matching key in a record. 
      * 
-     * @return  key.
+     * @return  <code>key</code>
      * @see #setKey(int key)
      */
     public int getKey() {
         return this.key;
     }
-    
-//    /**
-//     * Gets the start timestamp.
-//     * @return startTime
-//     */
-//    public long getStartTime() {
-//        return startTime;
-//    }
+
+    /**
+     * Gets the start timestamp. The <code>startTime</code> is set/should be set
+     * by the methods that processes the files.
+     * 
+     * @return <code>startTime</code>
+     */
+    public long getStartTime() {
+        return startTime;
+    }
 
     /**
      * Sets the index of the key in a delimitied string. <p>
@@ -168,18 +164,19 @@ public abstract class DTAbstract {
      * @param trace    Trace level.
      * @see TRACE
      */
-    public void setTrace(TRACE _trace) {
-        this.trace = _trace;
+    public void setTrace(TRACE trace) {
+        this.trace = trace;
     }
-/**
- * Sets how big the ArrayList structures should initialy be. If the value is
- * greater than 0 it sets the <code>ensureCapacity()</code> on the ArrayList.
- *  
- * @param minRowCount Value to pass to ensureCapacity()
- * @see java.util.ArrayList#ensureCapacity(int) 
- */
-    public void setMinRowCount(int _minRowCount) {
-        this.minRowCount = _minRowCount;
+
+    /**
+     * Sets how big the ArrayList structures should initialy be. If the value is
+     * greater than 0 it sets the <code>ensureCapacity()</code> on the ArrayList.
+     *  
+     * @param minRowCount Value to pass to ensureCapacity()
+     * @see java.util.ArrayList#ensureCapacity(int) 
+     */
+    public void setMinRowCount(int minRowCount) {
+        this.minRowCount = minRowCount;
     }
 
     /**
@@ -188,7 +185,7 @@ public abstract class DTAbstract {
      * @param tracer   Tracer object.
      * @see Tracer
      */
-    public void setTracer(Tracer _tracer) {
-        this.tracer = _tracer;
+    public void setTracer(Tracer tracer) {
+        this.tracer = tracer;
     }
 }
