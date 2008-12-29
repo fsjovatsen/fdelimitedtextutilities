@@ -7,9 +7,9 @@ package net.sjovatsen.delimitedtext;
  * @version 1.0.0
  * @see Tracer
  */
-public class fTracerStandardOutput implements Tracer {
+public class TracerStandardOutput implements Tracer {
     
-    public fTracerStandardOutput() {
+    public TracerStandardOutput() {
         
     }
 
