@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class fDTDeltaBuilder extends fDTAbstract {
+public class DTDeltaBuilder extends fDTAbstract {
 
     private File _ndf;
     private File _odf;
@@ -32,7 +32,7 @@ public class fDTDeltaBuilder extends fDTAbstract {
     /**
      * Class constructor.
      */
-    public fDTDeltaBuilder() {
+    public DTDeltaBuilder() {
         this._ndf = null;
         this._odf = null;
         this._nif = null;
@@ -50,7 +50,7 @@ public class fDTDeltaBuilder extends fDTAbstract {
      * @param odf   Old data file.
      * @param nif   New input file.
      */
-    public fDTDeltaBuilder(File ndf, File odf, File nif) {
+    public DTDeltaBuilder(File ndf, File odf, File nif) {
         this._ndf = ndf;
         this._odf = odf;
         this._nif = nif;
@@ -70,7 +70,7 @@ public class fDTDeltaBuilder extends fDTAbstract {
      * @param key   Index of the key in a record.
      * @param delimiter Char that separates the fields in a record.
      */
-    public fDTDeltaBuilder(File ndf, File odf, File nif, int key, String delimiter) {
+    public DTDeltaBuilder(File ndf, File odf, File nif, int key, String delimiter) {
         this._ndf = ndf;
         this._odf = odf;
         this._nif = nif;
