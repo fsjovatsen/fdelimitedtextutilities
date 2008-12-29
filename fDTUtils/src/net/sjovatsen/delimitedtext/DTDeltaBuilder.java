@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-public class DTDeltaBuilder extends fDTAbstract {
+public class DTDeltaBuilder extends DTAbstract {
 
     private File _ndf;
     private File _odf;

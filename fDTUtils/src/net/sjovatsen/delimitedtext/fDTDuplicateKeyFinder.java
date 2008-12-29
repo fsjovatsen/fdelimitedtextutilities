@@ -17,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 
-public class fDTDuplicateKeyFinder extends fDTAbstract {
+public class fDTDuplicateKeyFinder extends DTAbstract {
 
     private File _file;
     //private String[] _duplicates;
