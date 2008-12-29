@@ -1,34 +1,21 @@
 /*
-    This file is part of fDTUtils.
+This file is part of fDTUtils.
 
-    fDTUtils is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+fDTUtils is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Foobar is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+fDTUtils is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+You should have received a copy of the GNU General Public License
+along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sjovatsen.delimitedtext;
 
-/** 
- * Class to make a delta file.
- *
- * This class takes a new data file (NDF) and a old data file (ODF) and finds
- * the changes. It markes the changes with ADD, MODIFY or DELETE.
- * 
- * The use is initially for the Delimited Text Driver for Novell Identity Manager,
- * but it should work fine for more generic use also.
- * 
- * @author      Frode Sjovatsen <frode@sjovatsen.net>
- * @version     1.0.0
- */
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileReader;
@@ -41,6 +28,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+/** 
+ * Class to make a delta file.
+ *
+ * This class takes a new data file (NDF) and a old data file (ODF) and finds
+ * the changes. It markes the changes with ADD, MODIFY or DELETE.
+ * 
+ * The use is initially for the Delimited Text Driver for Novell Identity Manager,
+ * but it should work fine for more generic use also.
+ * 
+ * @author      Frode Sjovatsen <frode@sjovatsen.net>
+ * 
+ * TODO: Need to hardend the error checking/exceptions.
+ */
 public class DTDeltaBuilder extends DTAbstract {
 
     private File ndFile;
@@ -64,9 +64,9 @@ public class DTDeltaBuilder extends DTAbstract {
     /**
      * Class constructor specifying files for delta building.
      * 
-     * @param ndFile   New data file.
-     * @param odFile   Old data file.
-     * @param niFile   New input file.
+     * @param ndf   New data file.
+     * @param odf   Old data file.
+     * @param nif   New input file.
      */
     public DTDeltaBuilder(File ndf, File odf, File nif) {
         this.ndFile = ndf;
@@ -82,9 +82,9 @@ public class DTDeltaBuilder extends DTAbstract {
     /**
      * Class constructor specifying files for delta building.
      * 
-     * @param ndFile   New data file.
-     * @param odFile   Old data file.
-     * @param niFile   New input file.
+     * @param ndf   New data file.
+     * @param odf   Old data file.
+     * @param nif   New input file.
      * @param key   Index of the key in a record.
      * @param delimiter Char that separates the fields in a record.
      */
@@ -129,9 +129,6 @@ public class DTDeltaBuilder extends DTAbstract {
             ArrayList<String> odfArrayList = new ArrayList<String>();
             ArrayList<String> ndfArrayList = new ArrayList<String>();
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            //long startTime = 0;
-            //long currentTime = 0;
-            //long elapsed = 0;
 
             message("--------------------------------------------------");
             message(" Start building delta file...");
@@ -161,7 +158,6 @@ public class DTDeltaBuilder extends DTAbstract {
             }
             while ((ndfLine = ndfFile.readLine()) != null) {
                 ndfArrayList.add(ndfLine);
-            //iNDFCount++;
             }
             iNDFCount = ndfArrayList.size();
             ndfFile.close();
@@ -205,7 +201,6 @@ public class DTDeltaBuilder extends DTAbstract {
                     iNIFCount++;
                     nifFile.println("ADD," + ndfLine);
                 }
-                //message("odfArrayList.size()=" + odfArrayList.size());
             } /* End ADD or MODIFY */
 
 
@@ -238,12 +233,6 @@ public class DTDeltaBuilder extends DTAbstract {
             } /* End of DELETE */
 
             /*
-             * Now I can tell you how much time this took.
-             */
-            //currentTime = System.currentTimeMillis();
-            //dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-
-            /*
              * Lets share some stats with the user
              */
             message(" The fDTDeltaBuilder took " + formatElapsedTime() + " to finish.");
@@ -273,27 +262,27 @@ public class DTDeltaBuilder extends DTAbstract {
     /**
      * Sets the new data file.
      * 
-     * @param ndFile
+     * @param ndf
      */
-    public void setNDF(File _ndf) {
-        this.ndFile = _ndf;
+    public void setNDF(File ndf) {
+        this.ndFile = ndf;
     }
 
     /**
      * Sets the new input file.
      * 
-     * @param niFile
+     * @param nif
      */
-    public void setNIF(File _nif) {
-        this.niFile = _nif;
+    public void setNIF(File nif) {
+        this.niFile = nif;
     }
 
     /**
      * Sets the old data file.
      * 
-     * @param odFile
+     * @param odf
      */
-    public void setODF(File _odf) {
-        this.odFile = _odf;
+    public void setODF(File odf) {
+        this.odFile = odf;
     }
 }

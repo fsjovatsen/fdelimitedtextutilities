@@ -1,20 +1,19 @@
 /*
-    This file is part of fDTUtils.
+This file is part of fDTUtils.
 
-    fDTUtils is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+fDTUtils is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    Foobar is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+fDTUtils is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
+You should have received a copy of the GNU General Public License
+along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sjovatsen.delimitedtext;
 
 /**
@@ -22,8 +21,7 @@ package net.sjovatsen.delimitedtext;
  * tracing. E.g. one can implement a class that traces to the DSTrace screen on
  * eDirectory or to standard output.
  * 
- * @author fsjovatsen
- * @version 1.0.0
+ * @author Frode Sjovatsen <frode@sjovatsen.net>
  */
 public interface Tracer {
 
@@ -34,5 +32,4 @@ public interface Tracer {
      * @param message   The string to trace.
      */
     public void traceMessage(String message);
-    
 }
