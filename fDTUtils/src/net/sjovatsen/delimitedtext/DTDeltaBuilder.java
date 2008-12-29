@@ -1,6 +1,24 @@
+/*
+    This file is part of fDTUtils.
+
+    fDTUtils is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Foobar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.sjovatsen.delimitedtext;
 
-/** Class to make a delta file.
+/** 
+ * Class to make a delta file.
  *
  * This class takes a new data file (NDF) and a old data file (ODF) and finds
  * the changes. It markes the changes with ADD, MODIFY or DELETE.
@@ -170,19 +188,19 @@ public class DTDeltaBuilder extends DTAbstract {
 
                 if (bMatchedKey) { /* The record exits in both NDF and ODF */
                     odfArrayList.remove(i);
-                    trace("The key (" + ndfLineArray[this.key] + ") was found i both NDF and ODF. Now we need to check if the whole record matches");
+                    trace(" The key (" + ndfLineArray[this.key] + ") was found i both NDF and ODF. Now we need to check if the whole record matches");
 
                     if (ndfLine.equals(odfLine)) {
-                        trace("The record was equal. Skipping this record in NIF.");
+                        trace(" The record was equal. Skipping this record in NIF.");
                     } else {
-                        trace("The record was not equal. This is a MODIFY. Pushing record to NIF.");
+                        trace(" The record was not equal. This is a MODIFY. Pushing record to NIF.");
                         iMODIFYCount++;
                         iNIFCount++;
                         nifFile.println("MODIFY," + ndfLine);
                     }
                     bMatchedKey = false;
                 } else { /* The record was found in NDF but not in ODF */
-                    trace("The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
+                    trace(" The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
                     iADDCount++;
                     iNIFCount++;
                     nifFile.println("ADD," + ndfLine);
@@ -209,10 +227,10 @@ public class DTDeltaBuilder extends DTAbstract {
                 }
 
                 if (bMatchedKey) {
-                    trace("The key (" + ndfLineArray[this.key] + ") was found i both ODF and NDF. We should keep this user.");
+                    trace(" The key (" + ndfLineArray[this.key] + ") was found i both ODF and NDF. We should keep this user.");
                     bMatchedKey = false;
                 } else {
-                    trace("The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
+                    trace(" The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
                     iDELETECount++;
                     iNIFCount++;
                     nifFile.println("DELETE," + odfLine);
