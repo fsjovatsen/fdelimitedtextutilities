@@ -1,18 +1,21 @@
 /*
-This file is part of fDTUtils.
-
-fDTUtils is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-fDTUtils is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of fDTUtils.
+ *
+ * fDTUtils is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fDTUtils is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Note that some of the embedded libraries may be using other licences.
+ * 
  */
 package net.sjovatsen.delimitedtext;
 
@@ -132,7 +135,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             String[] lineArray1 = null;
             boolean bMatchedKey = false;
             String line = null;
-            int firstIndex = 0;
+            int currentIndex = 0;
             int lastIndex = 0;
             int searchedRecords = 0;
             int recordCount = 0;
@@ -152,19 +155,42 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             file.close();
 
             recordCount = al1.size();
-
+            message(" It took " + formatElapsedTime() + " to to load the file.");
             /*
              * Lets find out if there are any dups.
              */
-            for (String s : al1) {
-                firstIndex = al1.indexOf(s);
-                lastIndex = al1.lastIndexOf(s);
+            int i = 0;
+            int ii = 0;
+            for (i = 0; i < recordCount; i++) {
+                String s = al1.get(i);
+                for (ii = (i + 1); ii < recordCount; ii++) {
+                    if (s.equals(al1.get(ii))) {
+                        bMatchedKey = true;
+                        break;
+                    }
+                }
                 searchedRecords++;
-                if (lastIndex > firstIndex) {
-                    bMatchedKey = true;
+                if (bMatchedKey) {
                     break;
+                //lastIndex = al1.indexOf(s);
+                //al1.remove(currentIndex);
+                
+//                if (lastIndex < currentIndex) {
+//                    bMatchedKey = true;
+//                    break;
+//                }
                 }
             }
+//            for (String s : al1) {
+//                //currentIndex = al1.indexOf(s);
+//                lastIndex = al1.lastIndexOf(s);
+//                searchedRecords++;
+//                if (lastIndex > currentIndex) {
+//                    bMatchedKey = true;
+//                    break;
+//                }
+//                currentIndex++;
+//            }
 
             message(" Determing if the file has duplicates took " + formatElapsedTime() + " to finish.");
             message(" File count " + recordCount);
