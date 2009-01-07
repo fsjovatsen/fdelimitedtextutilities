@@ -170,11 +170,11 @@ public class DTDeltaBuilder extends DTAbstract {
              */
             for (String lineNDFList : ndfArrayList) {
                 ndfLine = lineNDFList;
-                ndfLineArray = ndfLine.split(",");
+                ndfLineArray = ndfLine.split(this.delimiter);
                 i = 0;
                 for (String lineODFList : odfArrayList) {
                     odfLine = lineODFList;
-                    odfLineArray = odfLine.split(",");
+                    odfLineArray = odfLine.split(this.delimiter);
                     if (ndfLineArray[this.key].equals(odfLineArray[this.key])) {
                         bMatchedKey = true;
                         break;
@@ -211,10 +211,10 @@ public class DTDeltaBuilder extends DTAbstract {
             bMatchedKey = false;
             for (String lineODFList : odfArrayList) {
                 odfLine = lineODFList;
-                odfLineArray = odfLine.split(",");
+                odfLineArray = odfLine.split(this.delimiter);
                 for (String lineNDFList : ndfArrayList) {
                     ndfLine = lineNDFList;
-                    ndfLineArray = ndfLine.split(",");
+                    ndfLineArray = ndfLine.split(this.delimiter);
                     if (odfLineArray[this.key].equals(ndfLineArray[this.key])) {
                         bMatchedKey = true;
                         break;
