@@ -26,6 +26,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 //import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * This class finds if a delimited dupsFile has duplicate rows based on a key.
  * 
@@ -68,34 +71,29 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             ArrayList<String> dups = new ArrayList<String>();
             BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
             ArrayList<String> al1 = new ArrayList<String>();
-            String[] lineArray1 = null;
             String line = null;
             int searchedRecords = 0;
-            int firstIndex = 0;
-            int lastIndex = 0;
+            Map<String, Integer> dupMap = new HashMap<String, Integer>();
+            String[] record = null;
 
             message("--------------------------------------------------");
             message(" Start getting duplicates ...");
 
             this.startTime = System.currentTimeMillis();
 
-            /*
-             * Reading the dupsFile into a array.
-             */
             while ((line = file.readLine()) != null) {
-                lineArray1 = line.split(this.delimiter);
-                al1.add(lineArray1[this.key]);
-            }
-            file.close();
-
-            for (String s : al1) {
-                firstIndex = al1.indexOf(s);
-                lastIndex = al1.lastIndexOf(s);
+                record = line.split(this.delimiter);
                 searchedRecords++;
-                if (lastIndex > firstIndex) {
-                    dups.add(s);
+                if (dupMap.containsKey(record[this.key])) {
+                    //bMatchedKey = true;
+                    dups.add(record[this.key]);
+                //break;
+                } else {
+                    dupMap.put(record[this.key], 0);
                 }
+
             }
+
 
             /*
              * Lets share some stats with the user
@@ -131,14 +129,11 @@ public class DTDuplicateKeyFinder extends DTAbstract {
         try {
 
             BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
-            ArrayList<String> al1 = new ArrayList<String>();
-            String[] lineArray1 = null;
+            Map<String, Integer> dupMap = new HashMap<String, Integer>();
+            String[] record = null;
             boolean bMatchedKey = false;
             String line = null;
-            int currentIndex = 0;
-            int lastIndex = 0;
             int searchedRecords = 0;
-            int recordCount = 0;
 
             message("--------------------------------------------------");
             message(" Start searching for duplicates ...");
@@ -146,58 +141,28 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             this.startTime = System.currentTimeMillis();
 
             /*
-             * Reading the dupsFile into a array.
+             * Let's check for duplicates.
              */
             while ((line = file.readLine()) != null) {
-                lineArray1 = line.split(this.delimiter);
-                al1.add(lineArray1[this.key]);
+                record = line.split(this.delimiter);
+                searchedRecords++;
+                if (dupMap.containsKey(record[this.key])) {
+                    bMatchedKey = true;
+                    break;
+                } else {
+                    dupMap.put(record[this.key], 0);
+                }
+
             }
+
             file.close();
 
-            recordCount = al1.size();
-            message(" It took " + formatElapsedTime() + " to to load the file.");
-            /*
-             * Lets find out if there are any dups.
-             */
-            int i = 0;
-            int ii = 0;
-            for (i = 0; i < recordCount; i++) {
-                String s = al1.get(i);
-                for (ii = (i + 1); ii < recordCount; ii++) {
-                    if (s.equals(al1.get(ii))) {
-                        bMatchedKey = true;
-                        break;
-                    }
-                }
-                searchedRecords++;
-                if (bMatchedKey) {
-                    break;
-                //lastIndex = al1.indexOf(s);
-                //al1.remove(currentIndex);
-                
-//                if (lastIndex < currentIndex) {
-//                    bMatchedKey = true;
-//                    break;
-//                }
-                }
-            }
-//            for (String s : al1) {
-//                //currentIndex = al1.indexOf(s);
-//                lastIndex = al1.lastIndexOf(s);
-//                searchedRecords++;
-//                if (lastIndex > currentIndex) {
-//                    bMatchedKey = true;
-//                    break;
-//                }
-//                currentIndex++;
-//            }
-
             message(" Determing if the file has duplicates took " + formatElapsedTime() + " to finish.");
-            message(" File count " + recordCount);
             if (bMatchedKey) {
                 message(" Records searched before duplicate found " + searchedRecords);
             } else {
                 message(" No duplicates found.");
+                message(" Records searched " + searchedRecords);
             }
             message("--------------------------------------------------");
 
@@ -207,6 +172,9 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             trace("File not found (" + e.toString() + ").");
             return false;
         } catch (IOException e) {
+            trace(e.toString());
+            return false;
+        } catch (Exception e) {
             trace(e.toString());
             return false;
         }
