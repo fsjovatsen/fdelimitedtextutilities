@@ -1,18 +1,21 @@
 /*
-This file is part of fDTUtils.
-
-fDTUtils is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-fDTUtils is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of fDTUtils.
+ *
+ * fDTUtils is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fDTUtils is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Note that some of the embedded libraries may be using other licences.
+ * 
  */
 package net.sjovatsen.delimitedtext;
 
@@ -23,10 +26,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
 
 /** 
  * Class to make a delta file.
@@ -46,6 +46,10 @@ public class DTDeltaBuilder extends DTAbstract {
     private File ndFile;
     private File odFile;
     private File niFile;
+    private static final String DEFAULT_DELIMITER = ",";
+    private static final int DEFAULT_KEY = 0;
+    private static final int DEFAULT_ROWCOUNT = 0;
+    private static final String VERSION = "1.0.0";
 
     /**
      * Class constructor.
@@ -54,10 +58,10 @@ public class DTDeltaBuilder extends DTAbstract {
         this.ndFile = null;
         this.odFile = null;
         this.niFile = null;
-        this.key = 0;
+        this.key = DEFAULT_KEY;
         this.trace = TRACE.DEFAULT;
-        this.delimiter = ",";
-        this.minRowCount = 0;
+        this.delimiter = DEFAULT_DELIMITER;
+        this.minRowCount = DEFAULT_ROWCOUNT;
         this.tracer = null;
     }
 
@@ -72,10 +76,10 @@ public class DTDeltaBuilder extends DTAbstract {
         this.ndFile = ndf;
         this.odFile = odf;
         this.niFile = nif;
-        this.key = 0;
+        this.key = DEFAULT_KEY;
         this.trace = TRACE.DEFAULT;
-        this.minRowCount = 0;
-        this.trace = TRACE.DEFAULT;
+        this.minRowCount = DEFAULT_ROWCOUNT;
+        this.delimiter = DEFAULT_DELIMITER;
         this.tracer = null;
     }
 
@@ -94,7 +98,7 @@ public class DTDeltaBuilder extends DTAbstract {
         this.niFile = nif;
         this.key = key;
         this.delimiter = delimiter;
-        this.minRowCount = 0;
+        this.minRowCount = DEFAULT_ROWCOUNT;
         this.trace = TRACE.DEFAULT;
         this.tracer = null;
     }
@@ -114,6 +118,8 @@ public class DTDeltaBuilder extends DTAbstract {
             BufferedReader ndfFile = new BufferedReader(new FileReader(ndFile));
             BufferedReader odfFile = new BufferedReader(new FileReader(odFile));
             PrintWriter nifFile = new PrintWriter(new FileWriter(niFile));
+            ArrayList<String> odfArrayList = new ArrayList<String>();
+            ArrayList<String> ndfArrayList = new ArrayList<String>();
             String ndfLine = null;
             String[] ndfLineArray = null;
             String odfLine = null;
@@ -125,10 +131,7 @@ public class DTDeltaBuilder extends DTAbstract {
             int iMODIFYCount = 0;
             int iDELETECount = 0;
             int i = 0;
-            Boolean bMatchedKey = false;
-            ArrayList<String> odfArrayList = new ArrayList<String>();
-            ArrayList<String> ndfArrayList = new ArrayList<String>();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            Boolean matchedKey = false;
 
             message("--------------------------------------------------");
             message(" Start building delta file...");
@@ -145,7 +148,6 @@ public class DTDeltaBuilder extends DTAbstract {
             }
             while ((odfLine = odfFile.readLine()) != null) {
                 odfArrayList.add(odfLine);
-            //iODFCount++;
             }
             iODFCount = odfArrayList.size();
             odfFile.close();
@@ -176,13 +178,14 @@ public class DTDeltaBuilder extends DTAbstract {
                     odfLine = lineODFList;
                     odfLineArray = odfLine.split(this.delimiter);
                     if (ndfLineArray[this.key].equals(odfLineArray[this.key])) {
-                        bMatchedKey = true;
+                        matchedKey = true;
                         break;
                     }
                     i++;
                 }
 
-                if (bMatchedKey) { /* The record exits in both NDF and ODF */
+                /* Searching for ADD or MODIFY */
+                if (matchedKey) { /* The record exits in both NDF and ODF */
                     odfArrayList.remove(i);
                     trace(" The key (" + ndfLineArray[this.key] + ") was found i both NDF and ODF. Now we need to check if the whole record matches");
 
@@ -194,7 +197,7 @@ public class DTDeltaBuilder extends DTAbstract {
                         iNIFCount++;
                         nifFile.println("MODIFY," + ndfLine);
                     }
-                    bMatchedKey = false;
+                    matchedKey = false;
                 } else { /* The record was found in NDF but not in ODF */
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
                     iADDCount++;
@@ -208,7 +211,7 @@ public class DTDeltaBuilder extends DTAbstract {
              * Comparing ODF with NDF to find persons that is no longer present.
              * We will find the DELETE events.
              */
-            bMatchedKey = false;
+            matchedKey = false;
             for (String lineODFList : odfArrayList) {
                 odfLine = lineODFList;
                 odfLineArray = odfLine.split(this.delimiter);
@@ -216,14 +219,14 @@ public class DTDeltaBuilder extends DTAbstract {
                     ndfLine = lineNDFList;
                     ndfLineArray = ndfLine.split(this.delimiter);
                     if (odfLineArray[this.key].equals(ndfLineArray[this.key])) {
-                        bMatchedKey = true;
+                        matchedKey = true;
                         break;
                     }
                 }
 
-                if (bMatchedKey) {
+                if (matchedKey) {
                     trace(" The key (" + ndfLineArray[this.key] + ") was found i both ODF and NDF. We should keep this user.");
-                    bMatchedKey = false;
+                    matchedKey = false;
                 } else {
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
                     iDELETECount++;
@@ -283,6 +286,15 @@ public class DTDeltaBuilder extends DTAbstract {
      * @param odf
      */
     public void setODF(File odf) {
+
         this.odFile = odf;
+    }
+
+    /**
+     * Returns class version
+     * @return <code>VERSION</code>
+     */
+    public static String version() {
+        return VERSION;
     }
 }

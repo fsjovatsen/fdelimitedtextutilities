@@ -25,7 +25,6 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-//import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,12 +38,15 @@ import java.util.Map;
  */
 public class DTDuplicateKeyFinder extends DTAbstract {
 
-    private File dupsFile = null;
-
+    private File dupsFile;
+    private static final int DUMMY_MAP_VALUE = 0;
+    private static final String VERSION = "1.0.0";
+    
     /**
      * The default class constructor.
      */
     public DTDuplicateKeyFinder() {
+        dupsFile = null;
     }
 
     /**
@@ -53,9 +55,9 @@ public class DTDuplicateKeyFinder extends DTAbstract {
      * @param file The file to search for duplicates in.
      */
     public DTDuplicateKeyFinder(File file) {
-        if (file != null) {
-            this.dupsFile = file;
-        }
+        //if (file != null) {
+        this.dupsFile = file;
+    //}
     }
 
     /**
@@ -70,7 +72,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
         try {
             ArrayList<String> dups = new ArrayList<String>();
             BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
-            ArrayList<String> al1 = new ArrayList<String>();
+            //ArrayList<String> al1 = new ArrayList<String>();
             String line = null;
             int searchedRecords = 0;
             Map<String, Integer> dupMap = new HashMap<String, Integer>();
@@ -81,6 +83,9 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
             this.startTime = System.currentTimeMillis();
 
+            /*
+             * Searching for dups and adding them to the array.
+             */
             while ((line = file.readLine()) != null) {
                 record = line.split(this.delimiter);
                 searchedRecords++;
@@ -89,7 +94,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
                     dups.add(record[this.key]);
                 //break;
                 } else {
-                    dupMap.put(record[this.key], 0);
+                    dupMap.put(record[this.key], DUMMY_MAP_VALUE);
                 }
 
             }
@@ -131,7 +136,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             BufferedReader file = new BufferedReader(new FileReader(this.dupsFile));
             Map<String, Integer> dupMap = new HashMap<String, Integer>();
             String[] record = null;
-            boolean bMatchedKey = false;
+            boolean matchedKey = false;
             String line = null;
             int searchedRecords = 0;
 
@@ -147,10 +152,10 @@ public class DTDuplicateKeyFinder extends DTAbstract {
                 record = line.split(this.delimiter);
                 searchedRecords++;
                 if (dupMap.containsKey(record[this.key])) {
-                    bMatchedKey = true;
+                    matchedKey = true;
                     break;
                 } else {
-                    dupMap.put(record[this.key], 0);
+                    dupMap.put(record[this.key], DUMMY_MAP_VALUE);
                 }
 
             }
@@ -158,7 +163,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             file.close();
 
             message(" Determing if the file has duplicates took " + formatElapsedTime() + " to finish.");
-            if (bMatchedKey) {
+            if (matchedKey) {
                 message(" Records searched before duplicate found " + searchedRecords);
             } else {
                 message(" No duplicates found.");
@@ -166,7 +171,7 @@ public class DTDuplicateKeyFinder extends DTAbstract {
             }
             message("--------------------------------------------------");
 
-            return bMatchedKey;
+            return matchedKey;
 
         } catch (FileNotFoundException e) {
             trace("File not found (" + e.toString() + ").");
@@ -187,8 +192,14 @@ public class DTDuplicateKeyFinder extends DTAbstract {
      * @see DTDuplicateKeyFinder
      */
     public void setFile(File file) {
-        if (file != null) {
-            this.dupsFile = file;
-        }
+        this.dupsFile = file;
+    }
+
+    /**
+     * Returns class version
+     * @return <code>VERSION</code>
+     */
+    public static String version() {
+        return VERSION;
     }
 }
