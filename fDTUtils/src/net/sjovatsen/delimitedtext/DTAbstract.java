@@ -44,13 +44,12 @@ public abstract class DTAbstract {
     protected TRACE trace;
     protected int minRowCount;
     protected Tracer tracer;
-
+    
     /**
      * Class constructor.
      */
     public DTAbstract() {
         this.startTime = 0;
-        //this.currentTime = 0;
         this.key = 0;
         this.delimiter = ",";
         this.trace = TRACE.DEFAULT;
