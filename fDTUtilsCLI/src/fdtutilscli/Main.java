@@ -38,6 +38,8 @@ public class Main {
     private static final String E_MSG_UNREC_OPT = "unknown option.";
     private static final String DEFAULT_SEPERATOR = ",";
     private static final int DEFAULT_KEY = 0;
+    private static final String VERSION = "1.0.0";
+    private static final String APP_NAME = "fDTUtilsCLI";
 
     /**
      * 
@@ -56,6 +58,7 @@ public class Main {
         optCommand.addOption(OptionBuilder.withArgName("ndf odf nif key seperator").hasArgs(5).withValueSeparator(' ').withDescription("Description").create("delta"));
         optCommand.addOption(OptionBuilder.withArgName("dupsfile key seperator").hasArgs(3).withDescription("Description").create("duplicates"));
         optCommand.addOption(OptionBuilder.withLongOpt("help").withDescription("print this message.").create("h"));
+        optCommand.addOption(OptionBuilder.withLongOpt("version").withDescription("print version information.").create("V"));
         optOutput.addOption(new Option("verbose", "be extra verbose"));
         optOutput.addOption(new Option("quiet", "be extra quiet"));
         optOutput.addOption(new Option("silent", "same as --quiet"));
@@ -73,6 +76,11 @@ public class Main {
 
             if (line.hasOption("h")) {
                 formatter.printHelp(HELP_SYNTAX, HELP_HEADER, options, null, true);
+                return;
+            } else if (line.hasOption("V")) {
+                System.out.println(APP_NAME + " version " + VERSION);
+                System.out.println("fDTDeltaBuilder version " + DTDeltaBuilder.version());
+                System.out.println("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
                 return;
             } else if (line.hasOption("delta")) {
                 String ndf = line.getOptionValues("delta")[0];
