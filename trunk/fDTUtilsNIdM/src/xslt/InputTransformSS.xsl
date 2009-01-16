@@ -93,7 +93,7 @@
                         </xsl:when>
                         <!-- End DELETE event -->
 
-                        <!-- If the event don't match ADD, DELETE, MODIFY we 
+                        <!-- If the event don't match ADD, DELETE, MODIFY we
                              return a empty document and sends a message to
                              the trace.
                         -->
