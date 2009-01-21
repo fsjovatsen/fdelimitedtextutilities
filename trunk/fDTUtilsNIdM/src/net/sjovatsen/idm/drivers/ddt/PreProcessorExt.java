@@ -26,20 +26,27 @@ import net.sjovatsen.delimitedtext.DTDeltaBuilder;
 import net.sjovatsen.delimitedtext.DTDuplicateKeyFinder;
 //import net.sjovatsen.delimitedtext.DTDeltaBuilder;
 import net.sjovatsen.delimitedtext.TRACE;
+import net.sjovatsen.idm.drivers.Config;
 
 /**
  *
- * @author FSjovatsen
+ * @author Frode Sjovatsen <frode @ sjovatsen.net>
  */
 public class PreProcessorExt implements PreProcessor {
 
     private Tracer tracer = null;
-
+    private TRACE trace = null;
+    private Config config = null;
+    
     public void init(String parameterString, Tracer tracer) {
 
         this.tracer = tracer;
+        this.trace = TRACE.DEFAULT;
+        this.config = new Config(parameterString);
 
         tracer.traceMessage("Greetings from Frode Sjovatsen!");
+        tracer.traceMessage("DTDeltaBuilder version " + DTDeltaBuilder.version());
+        tracer.traceMessage("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
     }
 
     public void nextInputFile(File inputFile) throws SkipFileException {
@@ -52,7 +59,7 @@ public class PreProcessorExt implements PreProcessor {
         DTDuplicateKeyFinder dupsFinder = new DTDuplicateKeyFinder();
         DTDeltaBuilder deltaBuilder = new DTDeltaBuilder();
         TracerDSTrace dstrace = new TracerDSTrace(tracer);
-
+        
         tracer.traceMessage(" Determin if there is a corresponding ODF file?");
 
         try {
@@ -72,8 +79,8 @@ public class PreProcessorExt implements PreProcessor {
 
             tracer.traceMessage(" All files are ready to be processed.");
             dupsFinder.setFile(ndFile);
-            dupsFinder.setDelimiter(";");
-            dupsFinder.setKey(3);
+            dupsFinder.setDelimiter(config.get("delimiter"));
+            dupsFinder.setKey(config.get("key"));
             dupsFinder.setTracer(dstrace);
             dupsFinder.setTrace(TRACE.VERBOSE);
             if (dupsFinder.hasDuplicateKeys()) {
@@ -88,20 +95,36 @@ public class PreProcessorExt implements PreProcessor {
             deltaBuilder.setTrace(TRACE.VERBOSE);
             deltaBuilder.setTracer(new TracerDSTrace(tracer));
             deltaBuilder.buildDeltaFile();
-
-
-
-
-
-            tracer.traceMessage("--- End executing PreProcessorExt.nextInputFile() ---");
+            
+            odFile.delete();
+            ndFile.renameTo(odFile);
+           tracer.traceMessage("--- End executing PreProcessorExt.nextInputFile() ---");
 
         } catch (IOException e) {
         } finally {
-
         }
 
     }
 
+    private void message(String s) {
+        if ((trace == TRACE.QUIET) || (tracer == null)) {
+            return;
+        }
+        tracer.traceMessage(s);
+    }
+
+    private void trace(String s) {
+        if ((trace == TRACE.VERBOSE) || (tracer != null)) {
+            tracer.traceMessage(s);
+        }        
+    }
+
+    /**
+     * 
+     * @param in
+     * @param out
+     * @throws java.io.IOException
+     */
     private void copyFile(File in, File out) throws IOException {
 
         FileChannel inChannel = new FileInputStream(in).getChannel();
@@ -115,6 +138,7 @@ public class PreProcessorExt implements PreProcessor {
             if (inChannel != null) {
                 inChannel.close();
             }
+
             if (outChannel != null) {
                 outChannel.close();
             }
