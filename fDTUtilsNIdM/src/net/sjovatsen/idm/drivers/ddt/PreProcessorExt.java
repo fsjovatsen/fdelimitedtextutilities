@@ -34,89 +34,99 @@ import net.sjovatsen.idm.drivers.Config;
  */
 public class PreProcessorExt implements PreProcessor {
 
-    private Tracer tracer = null;
+    private TracerDSTrace dstracer = null;
     private TRACE trace = null;
     private Config config = null;
-    
+    private boolean allowDuplicates = false;
+
     public void init(String parameterString, Tracer tracer) {
 
-        this.tracer = tracer;
-        this.trace = TRACE.DEFAULT;
+        this.dstracer = new TracerDSTrace(tracer);
         this.config = new Config(parameterString);
+        this.trace = traceTypeFromConfig(config.get("trace"));
+        this.allowDuplicates = new Boolean(config.get("dups")).booleanValue();
 
-        tracer.traceMessage("Greetings from Frode Sjovatsen!");
-        tracer.traceMessage("DTDeltaBuilder version " + DTDeltaBuilder.version());
-        tracer.traceMessage("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
+        message("--- Loading PreProcessorExt ---");
+        message("Greetings from Frode Sjovatsen!");
+        message("DTDeltaBuilder version " + DTDeltaBuilder.version());
+        message("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
+        config.dumpConfig(dstracer);
+        message("--- End loading PreProcessorExt ---");
     }
 
-    public void nextInputFile(File inputFile) throws SkipFileException {
+    public void nextInputFile(File inputFile) throws SkipFileException, StatusException {
 
-        tracer.traceMessage("--- Executing PreProcessorExt.nextInputFile() ---");
+        message("--- Executing PreProcessorExt.nextInputFile() ---");
 
         File ndFile = new File(inputFile.getPath() + ".NDF");
         File odFile = new File(inputFile.getPath() + ".ODF");
         File niFile = new File(inputFile.getPath() + ".NIF");
         DTDuplicateKeyFinder dupsFinder = new DTDuplicateKeyFinder();
         DTDeltaBuilder deltaBuilder = new DTDeltaBuilder();
-        TracerDSTrace dstrace = new TracerDSTrace(tracer);
-        
-        tracer.traceMessage(" Determin if there is a corresponding ODF file?");
+        //TracerDSTrace dstrace = new TracerDSTrace(tracer);
+
+        message(" Determin if there is a corresponding ODF file?");
 
         try {
             if (!odFile.exists()) {
 
-                tracer.traceMessage(" ODF file  do not exits (" + odFile.getPath() + ")");
-                tracer.traceMessage(" Assuming this is the first run for the driver. Creating a empty ODF. This will make all records marked with a add event");
+                message(" ODF file  do not exits (" + odFile.getPath() + ")");
+                message(" Assuming this is the first run for the driver. Creating a empty ODF. This will make all records marked with a add event");
                 odFile.createNewFile();
             } else {
-                tracer.traceMessage(" ODF exits (" + odFile.getPath() + ")");
+                message(" ODF exits (" + odFile.getPath() + ")");
             }
 
-            tracer.traceMessage(" Copy inputFile to NDF.");
+            message(" Copy inputFile to NDF (" + inputFile.getPath() + " ==> " + ndFile.getPath() + ").");
             copyFile(inputFile, ndFile);
-            tracer.traceMessage(" Rename inputFile to NIF.");
+            //tracer.traceMessage(" Rename inputFile to NIF.");
             //inputFile.renameTo(niFile);
 
-            tracer.traceMessage(" All files are ready to be processed.");
+            message(" All files are ready to be processed.");
+
             dupsFinder.setFile(ndFile);
             dupsFinder.setDelimiter(config.get("delimiter"));
-            dupsFinder.setKey(config.get("key"));
-            dupsFinder.setTracer(dstrace);
-            dupsFinder.setTrace(TRACE.VERBOSE);
+            dupsFinder.setKey(Integer.parseInt(config.get("key")));
+            dupsFinder.setTracer(dstracer);
+            dupsFinder.setTrace(trace);
             if (dupsFinder.hasDuplicateKeys()) {
                 dupsFinder.getDuplicateKeys();
-                throw new SkipFileException();
+                if (!allowDuplicates) {
+                    throw new StatusException(StatusException.STATUS_WARNING, "The NDF contains duplicates.");
+                }
             }
             deltaBuilder.setNDF(ndFile);
             deltaBuilder.setODF(odFile);
             deltaBuilder.setNIF(inputFile);
-            deltaBuilder.setDelimiter(";");
-            deltaBuilder.setKey(3);
-            deltaBuilder.setTrace(TRACE.VERBOSE);
-            deltaBuilder.setTracer(new TracerDSTrace(tracer));
+            deltaBuilder.setDelimiter(config.get("delimiter"));
+            deltaBuilder.setKey(Integer.parseInt(config.get("key")));
+            deltaBuilder.setTrace(trace);
+            deltaBuilder.setTracer(dstracer);
             deltaBuilder.buildDeltaFile();
-            
+
             odFile.delete();
             ndFile.renameTo(odFile);
-           tracer.traceMessage("--- End executing PreProcessorExt.nextInputFile() ---");
+            message("--- End executing PreProcessorExt.nextInputFile() ---");
 
         } catch (IOException e) {
+        } catch (StatusException e) {
+            throw new SkipFileException();
         } finally {
         }
 
     }
 
     private void message(String s) {
-        if ((trace == TRACE.QUIET) || (tracer == null)) {
+        if ((trace == TRACE.QUIET) || (dstracer == null)) {
             return;
         }
-        tracer.traceMessage(s);
+        dstracer.traceMessage(s);
     }
 
     private void trace(String s) {
-        if ((trace == TRACE.VERBOSE) || (tracer != null)) {
-            tracer.traceMessage(s);
-        }        
+        if ((trace == TRACE.VERBOSE) || (dstracer != null)) {
+            dstracer.traceMessage(s);
+        }
     }
 
     /**
@@ -143,5 +153,17 @@ public class PreProcessorExt implements PreProcessor {
                 outChannel.close();
             }
         }
+    }
+
+    private TRACE traceTypeFromConfig(String s) {
+
+        if (s.equals("verbose")) {
+            return TRACE.VERBOSE;
+        } else if (s.equals("quiet")) {
+            return TRACE.QUIET;
+        } else {
+            return TRACE.DEFAULT;
+        }
+
     }
 }
