@@ -25,90 +25,104 @@
 
     <xsl:template match="/">
 
-        <nds dtdversion="1.1" ndsversion="8.6" xml:space="default">
-            <input>
-				<!-- for each record, do ... -->
-                <xsl:for-each select="delimited-text/record">
+        <xsl:choose>
+			<!-- if document element is delimited-text, then we need to do the transformation -->
+            <xsl:when test="delimited-text">
 
-                    <xsl:variable name="association" select="field[@name=$association-field-name]"/>
-                    <xsl:variable name="srcdn" select="concat('RFK-', field[@name=$association-field-name])"/>
-                    <xsl:variable name="event" select="field[@name='Event']"/>
+                <nds dtdversion="1.1" ndsversion="8.6" xml:space="default">
+                    <input>
+                        <!-- for each record, do ... -->
+                        <xsl:for-each select="delimited-text/record">
 
-                    <xsl:choose>
+                            <xsl:variable name="association" select="field[@name=$association-field-name]"/>
+                            <xsl:variable name="srcdn" select="concat('RFK-', field[@name=$association-field-name])"/>
+                            <xsl:variable name="event" select="field[@name='Event']"/>
 
-                        <!-- ADD event -->
-                        <xsl:when test="translate($event, $lc, $uc) = $add-event">
-                            <xsl:message>DEBUG (InputTransformSS) ==> This is a ADD event</xsl:message>
-								<!-- generate the add event -->
-                            <add class-name="{$object-class}" src-dn="{$srcdn}">
-									<!-- generate the association -->
-                                <association>
-                                    <xsl:value-of select="$association"/>
-                                </association>
-									<!-- handle each field -->
-                                <xsl:for-each select="field[string()]">
-                                    <xsl:variable name="fieldValue" select="normalize-space(.)"/>
-										<!-- generate the add-attr -->
-                                    <add-attr attr-name="{@name}">
-                                        <value type="string">
-                                            <xsl:value-of select="$fieldValue"/>
-                                        </value>
-                                    </add-attr>
-                                </xsl:for-each>
-                            </add>
-                        </xsl:when>
-                        <!-- End ADD event -->
+                            <xsl:choose>
 
-                        <!-- MODIFY event -->
-                        <xsl:when test="translate($event, $lc, $uc) = $modify-event">
-                            <xsl:message>DEBUG (InputTransformSS) ==> This is a MODIFY event</xsl:message>
-                            <modify class-name="{$object-class}" src-dn="{$srcdn}">
-                                <association>
-                                    <xsl:value-of select="$association"/>
-                                </association>
-                                <xsl:for-each select="field[string()]">
-                                    <xsl:variable name="fieldValue" select="normalize-space(.)"/>
-										<!-- generate the add-attr -->
-                                    <modify-attr attr-name="{@name}">
-                                        <remove-all-values/>
-                                        <add-value>
-                                            <value type="string">
-                                                <xsl:value-of select="$fieldValue"/>
-                                            </value>
-                                        </add-value>
-                                    </modify-attr>
-                                </xsl:for-each>
-                            </modify>
-                        </xsl:when>
-                        <!-- End MODIFY event -->
+                                <!-- ADD event -->
+                                <xsl:when test="translate($event, $lc, $uc) = $add-event">
+                                    <xsl:message>DEBUG (InputTransformSS) ==> This is a ADD event</xsl:message>
+                                    <!-- generate the add event -->
+                                    <add class-name="{$object-class}" src-dn="{$srcdn}">
+                                        <!-- generate the association -->
+                                        <association>
+                                            <xsl:value-of select="$association"/>
+                                        </association>
+                                        <!-- handle each field -->
+                                        <xsl:for-each select="field[string()]">
+                                            <xsl:variable name="fieldValue" select="normalize-space(.)"/>
+                                            <!-- generate the add-attr -->
+                                            <add-attr attr-name="{@name}">
+                                                <value type="string">
+                                                    <xsl:value-of select="$fieldValue"/>
+                                                </value>
+                                            </add-attr>
+                                        </xsl:for-each>
+                                    </add>
+                                </xsl:when>
+                                <!-- End ADD event -->
 
-                        <!-- DELETE event -->
-                        <xsl:when test="translate($event, $lc, $uc) = $delete-event">
-                            <xsl:message>DEBUG (InputTransformSS) ==> This is a DELETE event</xsl:message>
-                            <delete class-name="{$object-class}" src-dn="{$srcdn}">
-                                <association>
-                                    <xsl:value-of select="$association"/>
-                                </association>
-                            </delete>
-                        </xsl:when>
-                        <!-- End DELETE event -->
+                                <!-- MODIFY event -->
+                                <xsl:when test="translate($event, $lc, $uc) = $modify-event">
+                                    <xsl:message>DEBUG (InputTransformSS) ==> This is a MODIFY event</xsl:message>
+                                    <modify class-name="{$object-class}" src-dn="{$srcdn}">
+                                        <association>
+                                            <xsl:value-of select="$association"/>
+                                        </association>
+                                        <xsl:for-each select="field[string()]">
+                                            <xsl:variable name="fieldValue" select="normalize-space(.)"/>
+                                            <!-- generate the add-attr -->
+                                            <modify-attr attr-name="{@name}">
+                                                <remove-all-values/>
+                                                <add-value>
+                                                    <value type="string">
+                                                        <xsl:value-of select="$fieldValue"/>
+                                                    </value>
+                                                </add-value>
+                                            </modify-attr>
+                                        </xsl:for-each>
+                                    </modify>
+                                </xsl:when>
+                                <!-- End MODIFY event -->
 
-                        <!-- If the event don't match ADD, DELETE, MODIFY we
-                             return a empty document and sends a message to
-                             the trace.
-                        -->
-                        <xsl:otherwise>
-                            <xsl:message>
+                                <!-- DELETE event -->
+                                <xsl:when test="translate($event, $lc, $uc) = $delete-event">
+                                    <xsl:message>DEBUG (InputTransformSS) ==> This is a DELETE event</xsl:message>
+                                    <delete class-name="{$object-class}" src-dn="{$srcdn}">
+                                        <association>
+                                            <xsl:value-of select="$association"/>
+                                        </association>
+                                    </delete>
+                                </xsl:when>
+                                <!-- End DELETE event -->
+
+                                <!-- If the event don't match ADD, DELETE, MODIFY we
+                                     return a empty document and sends a message to
+                                     the trace.
+                                -->
+                                <xsl:otherwise>
+                                    <xsl:message>
 									DEBUG (InputTransformSS) ==> Unrecognized event.
-                            </xsl:message>
-                        </xsl:otherwise>
+                                    </xsl:message>
+                                </xsl:otherwise>
 
-                    </xsl:choose>
+                            </xsl:choose>
 
-                </xsl:for-each>
+                        </xsl:for-each>
 
-            </input>
-        </nds>
+                    </input>
+                </nds>
+
+            </xsl:when>
+
+            <xsl:otherwise>
+				<!-- if the document element is not <delimited-text> copy as is-->
+                <xsl:copy-of select="."/>
+            </xsl:otherwise>
+
+        </xsl:choose>
 
     </xsl:template>
+
 </xsl:stylesheet>
