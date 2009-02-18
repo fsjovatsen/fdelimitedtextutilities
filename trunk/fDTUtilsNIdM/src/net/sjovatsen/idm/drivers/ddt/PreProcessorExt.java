@@ -60,6 +60,7 @@ public class PreProcessorExt implements PreProcessor {
 
         File ndFile = new File(inputFile.getPath() + ".NDF");
         File odFile = new File(inputFile.getPath() + ".ODF");
+        File newODFile = new File(inputFile.getPath() + ".ODF");
         File niFile = new File(inputFile.getPath() + ".NIF");
         DTDuplicateKeyFinder dupsFinder = new DTDuplicateKeyFinder();
         DTDeltaBuilder deltaBuilder = new DTDeltaBuilder();
@@ -104,12 +105,37 @@ public class PreProcessorExt implements PreProcessor {
             deltaBuilder.setTracer(dstracer);
             deltaBuilder.buildDeltaFile();
 
-            odFile.delete();
-            ndFile.renameTo(odFile);
+//            message(" Copying NDF to ODF.");
+//            copyFile(ndFile, odFile);
+//            message(" Deleting NDF (" + ndFile.getPath() + ")");
+//            if (ndFile.delete()) {
+//                trace(" Delete NDF successede.");
+//            } else {
+//                trace(" Delete NDF failed.");
+//            }
+            message(" Deleting ODF (" + odFile.getPath() + ")");
+            if (odFile.delete()) {
+                trace(" Delete ODF successede.");
+            } else {
+                trace(" Delete ODF failed.");
+            }
+
+            message(" Rename NDF to ODF (" + ndFile.getPath() + " ==> " + newODFile.getPath() + ")");
+            if (ndFile.renameTo(newODFile)) {
+                trace(" Rename NDF to ODF success!");
+            } else {
+                trace(" Renamed NDF to ODF failed!");
+            }
             message("--- End executing PreProcessorExt.nextInputFile() ---");
 
         } catch (IOException e) {
         } catch (StatusException e) {
+            message(" Found duplicates. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
+            if (ndFile.delete()) {
+                trace(" Delete NDF successede.");
+            } else {
+                trace(" Delete NDF failed.");
+            }
             throw new SkipFileException();
         } finally {
         }
