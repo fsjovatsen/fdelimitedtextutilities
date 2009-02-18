@@ -99,6 +99,8 @@ public class DTDuplicateKeyFinder extends DTAbstract {
 
             }
 
+            file.close();
+
 
             /*
              * Lets share some stats with the user

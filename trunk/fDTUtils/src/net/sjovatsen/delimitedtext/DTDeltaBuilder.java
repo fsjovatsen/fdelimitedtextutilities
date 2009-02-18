@@ -46,9 +46,9 @@ public class DTDeltaBuilder extends DTAbstract {
     private File ndFile;
     private File odFile;
     private File niFile;
-    private static final String DEFAULT_DELIMITER = ",";
-    private static final int DEFAULT_KEY = 0;
-    private static final int DEFAULT_ROWCOUNT = 0;
+//    private static final String DEFAULT_DELIMITER = ",";
+//    private static final int DEFAULT_KEY = 0;
+//    private static final int DEFAULT_ROWCOUNT = 0;
     private static final String VERSION = "1.0.0";
 
     /**
@@ -195,14 +195,14 @@ public class DTDeltaBuilder extends DTAbstract {
                         trace(" The record was not equal. This is a MODIFY. Pushing record to NIF.");
                         iMODIFYCount++;
                         iNIFCount++;
-                        nifFile.println("MODIFY," + ndfLine);
+                        nifFile.println("MODIFY" + this.delimiter + ndfLine);
                     }
                     matchedKey = false;
                 } else { /* The record was found in NDF but not in ODF */
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
                     iADDCount++;
                     iNIFCount++;
-                    nifFile.println("ADD," + ndfLine);
+                    nifFile.println("ADD" + this.delimiter + ndfLine);
                 }
             } /* End ADD or MODIFY */
 
@@ -231,7 +231,7 @@ public class DTDeltaBuilder extends DTAbstract {
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
                     iDELETECount++;
                     iNIFCount++;
-                    nifFile.println("DELETE," + odfLine);
+                    nifFile.println("DELETE" + this.delimiter + odfLine);
                 }
             } /* End of DELETE */
 
