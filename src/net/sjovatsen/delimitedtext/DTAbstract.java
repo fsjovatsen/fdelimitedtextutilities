@@ -13,9 +13,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Note that some of the embedded libraries may be using other licences.
- * 
+ *
  */
 package net.sjovatsen.delimitedtext;
 
@@ -24,15 +24,15 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * This is the abstract class for all the fDT* classes. 
+ * This is the abstract class for all the fDT* classes.
  * It provides some data for:
  * <ul>
- *  <li>time measuring 
+ *  <li>time measuring
  *  <li>parsing a delimited record
  *  <li>datastructures performance
  *  <li>tracing
  * </ul>
- * 
+ *
  * @author Frode Sjovatsen <frode@sjovatsen.net>
  */
 public abstract class DTAbstract {
@@ -44,14 +44,18 @@ public abstract class DTAbstract {
     protected TRACE trace;
     protected int minRowCount;
     protected Tracer tracer;
-    
+
+    protected static final String DEFAULT_DELIMITER = ",";
+    protected static final int DEFAULT_KEY = 0;
+    protected static final int DEFAULT_ROWCOUNT = 0;
+
     /**
      * Class constructor.
      */
     public DTAbstract() {
         this.startTime = 0;
         this.key = 0;
-        this.delimiter = ",";
+        this.delimiter = DEFAULT_DELIMITER;
         this.trace = TRACE.DEFAULT;
         this.tracer = null;
         this.minRowCount = 0;
@@ -59,7 +63,7 @@ public abstract class DTAbstract {
 
     /**
      * Sends a verbose message to the tracer.
-     * 
+     *
      * @param s Message to trace.
      */
     protected void trace(String s) {
@@ -70,7 +74,7 @@ public abstract class DTAbstract {
 
     /**
      * Sends a informational message to the tracer.
-     * 
+     *
      * @param s Message to trace.
      */
     protected void message(String s) {
@@ -80,7 +84,7 @@ public abstract class DTAbstract {
     }
 
     /**
-     * 
+     *
      */
     protected String formatElapsedTime() {
 
@@ -93,9 +97,9 @@ public abstract class DTAbstract {
 
     /**
      * Calculates the time between the start timestamp and the current timestamp.
-     * 
+     *
      * @return  Time between <code>currentTime</code> and <code>startTime</code>.
-     * 
+     *
      */
     public long getElapsedTime() {
 
@@ -106,8 +110,8 @@ public abstract class DTAbstract {
 
     /**
      *  Sets the delimiter character for a record.
-     * 
-     * @param delimiter The character that splits a record into fields. 
+     *
+     * @param delimiter The character that splits a record into fields.
      *                  E.g. "," will split the record 1,Frode,Sjovatsen into
      *                  1
      *                  Frode
@@ -119,17 +123,17 @@ public abstract class DTAbstract {
 
     /**
      * Gets the delimiter.
-     * 
+     *
      * @return  <code>delimiter</code>
-     * @see #setDelimiter(java.lang.String) 
+     * @see #setDelimiter(java.lang.String)
      */
     public String getDelimiter() {
         return this.delimiter;
     }
 
     /**
-     * Gets the index that is the matching key in a record. 
-     * 
+     * Gets the index that is the matching key in a record.
+     *
      * @return  <code>key</code>
      * @see #setKey(int key)
      */
@@ -140,7 +144,7 @@ public abstract class DTAbstract {
     /**
      * Gets the start timestamp. The <code>startTime</code> is set/should be set
      * by the methods that processes the files.
-     * 
+     *
      * @return <code>startTime</code>
      */
     public long getStartTime() {
@@ -153,7 +157,7 @@ public abstract class DTAbstract {
      * 1,Frode,Sjovatsen<br>
      * 4,Ole,Olsen<p>
      * Index 0 will give the key 1 for the record "1,Frode,Sjovatsen".
-     * 
+     *
      * @param key
      */
     public void setKey(int key) {
@@ -162,7 +166,7 @@ public abstract class DTAbstract {
 
     /**
      * Sets the level of tracing.
-     * 
+     *
      * @param trace    Trace level.
      * @see TRACE
      */
@@ -173,9 +177,9 @@ public abstract class DTAbstract {
     /**
      * Sets how big the ArrayList structures should initialy be. If the value is
      * greater than 0 it sets the <code>ensureCapacity()</code> on the ArrayList.
-     *  
+     *
      * @param minRowCount Value to pass to ensureCapacity()
-     * @see java.util.ArrayList#ensureCapacity(int) 
+     * @see java.util.ArrayList#ensureCapacity(int)
      */
     public void setMinRowCount(int minRowCount) {
         this.minRowCount = minRowCount;
@@ -183,7 +187,7 @@ public abstract class DTAbstract {
 
     /**
      * Sets a tracer object.
-     * 
+     *
      * @param tracer   Tracer object.
      * @see Tracer
      */

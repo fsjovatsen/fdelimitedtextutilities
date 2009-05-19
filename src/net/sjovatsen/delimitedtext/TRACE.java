@@ -13,15 +13,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Note that some of the embedded libraries may be using other licences.
- * 
+ *
  */
 package net.sjovatsen.delimitedtext;
 
 /**
  *  Defines level of tracing.
- * 
+ *
  * @author Frode Sjovatsen <frode@sjovatsen.net>
  */
 public enum TRACE {
@@ -31,12 +31,12 @@ public enum TRACE {
      */
     QUIET,
     /**
-     * The Tracer object traces some informasjon like when it starts, stats 
+     * The Tracer object traces some informasjon like when it starts, stats
      * and when it's fininsh.
      */
     DEFAULT,
     /**
-     * The Tracer object traces everything. 
+     * The Tracer object traces everything.
      */
     VERBOSE
 }

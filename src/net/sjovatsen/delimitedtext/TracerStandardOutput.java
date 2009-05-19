@@ -13,15 +13,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Note that some of the embedded libraries may be using other licences.
- * 
+ *
  */
 package net.sjovatsen.delimitedtext;
 
 /**
  *  This class implements the Tracer interface. It traces to standard output.
- * 
+ *
  * @author Frode Sjovatsen <frode@sjovatsen.net>
  * @see Tracer
  */
@@ -32,7 +32,7 @@ public class TracerStandardOutput implements Tracer {
 
     /**
      * Prints the message string to standard output.
-     * 
+     *
      * @param message   The string to trace.
      */
     public void traceMessage(String message) {
