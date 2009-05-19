@@ -13,9 +13,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with fDTUtils.  If not, see <http://www.gnu.org/licenses/>.
- * 
+ *
  * Note that some of the embedded libraries may be using other licences.
- * 
+ *
  */
 package net.sjovatsen.delimitedtext;
 
@@ -28,17 +28,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-/** 
+/**
  * Class to make a delta file.
  *
  * This class takes a new data file (NDF) and a old data file (ODF) and finds
  * the changes. It markes the changes with ADD, MODIFY or DELETE.
- * 
+ *
  * The use is initially for the Delimited Text Driver for Novell Identity Manager,
  * but it should work fine for more generic use also.
- * 
+ *
  * @author      Frode Sjovatsen <frode@sjovatsen.net>
- * 
+ *
  * TODO: Need to hardend the error checking/exceptions.
  */
 public class DTDeltaBuilder extends DTAbstract {
@@ -46,9 +46,9 @@ public class DTDeltaBuilder extends DTAbstract {
     private File ndFile;
     private File odFile;
     private File niFile;
-    private static final String DEFAULT_DELIMITER = ",";
-    private static final int DEFAULT_KEY = 0;
-    private static final int DEFAULT_ROWCOUNT = 0;
+//    private static final String DEFAULT_DELIMITER = ",";
+//    private static final int DEFAULT_KEY = 0;
+//    private static final int DEFAULT_ROWCOUNT = 0;
     private static final String VERSION = "1.0.0";
 
     /**
@@ -67,7 +67,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
     /**
      * Class constructor specifying files for delta building.
-     * 
+     *
      * @param ndf   New data file.
      * @param odf   Old data file.
      * @param nif   New input file.
@@ -85,7 +85,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
     /**
      * Class constructor specifying files for delta building.
-     * 
+     *
      * @param ndf   New data file.
      * @param odf   Old data file.
      * @param nif   New input file.
@@ -104,12 +104,12 @@ public class DTDeltaBuilder extends DTAbstract {
     }
 
     /**
-     * Builds a delta file (NIF) by running a compartion of the NDF and ODF. 
-     * If a key is found in both NDF and ODF, and the whole record is equal, the 
+     * Builds a delta file (NIF) by running a compartion of the NDF and ODF.
+     * If a key is found in both NDF and ODF, and the whole record is equal, the
      * record is omitted in NIF. If the key is in both NDF and ODF, but the record
      * is not equal, it is marked as MODIFY and pushed to NIF. A record that is
      * only in NDF and not in ODF, is marked as ADD and pushed to NIF.
-     * If a record is in ODF, but not in NDF, the record is marked as DELETE 
+     * If a record is in ODF, but not in NDF, the record is marked as DELETE
      * and pushed to NIF.
      */
     public void buildDeltaFile() {
@@ -135,7 +135,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
             message("--------------------------------------------------");
             message(" Start building delta file...");
-            /* 
+            /*
              * I wonder how much time this takes?
              */
             this.startTime = System.currentTimeMillis();
@@ -195,14 +195,14 @@ public class DTDeltaBuilder extends DTAbstract {
                         trace(" The record was not equal. This is a MODIFY. Pushing record to NIF.");
                         iMODIFYCount++;
                         iNIFCount++;
-                        nifFile.println("MODIFY," + ndfLine);
+                        nifFile.println("MODIFY" + this.delimiter + ndfLine);
                     }
                     matchedKey = false;
                 } else { /* The record was found in NDF but not in ODF */
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found i both NDF and ODF. This is a ADD");
                     iADDCount++;
                     iNIFCount++;
-                    nifFile.println("ADD," + ndfLine);
+                    nifFile.println("ADD" + this.delimiter + ndfLine);
                 }
             } /* End ADD or MODIFY */
 
@@ -231,7 +231,7 @@ public class DTDeltaBuilder extends DTAbstract {
                     trace(" The key (" + ndfLineArray[this.key] + ") was not found in NDF but is in ODF. This is a DELETE.");
                     iDELETECount++;
                     iNIFCount++;
-                    nifFile.println("DELETE," + odfLine);
+                    nifFile.println("DELETE" + this.delimiter + odfLine);
                 }
             } /* End of DELETE */
 
@@ -264,7 +264,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
     /**
      * Sets the new data file.
-     * 
+     *
      * @param ndf
      */
     public void setNDF(File ndf) {
@@ -273,7 +273,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
     /**
      * Sets the new input file.
-     * 
+     *
      * @param nif
      */
     public void setNIF(File nif) {
@@ -282,7 +282,7 @@ public class DTDeltaBuilder extends DTAbstract {
 
     /**
      * Sets the old data file.
-     * 
+     *
      * @param odf
      */
     public void setODF(File odf) {
