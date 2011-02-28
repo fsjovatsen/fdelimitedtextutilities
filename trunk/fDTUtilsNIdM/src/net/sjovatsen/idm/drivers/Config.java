@@ -5,9 +5,9 @@
 package net.sjovatsen.idm.drivers;
 
 import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.Iterator;
 import java.util.Map;
-import net.sjovatsen.idm.drivers.ddt.TracerDSTrace;
+//import net.sjovatsen.idm.drivers.ddt.TracerDSTrace;
 
 /**
  *
@@ -53,6 +53,17 @@ public class Config {
     }
 
     /**
+     *
+     * @return configString
+     */
+    public String configString() {
+
+        return this.configString;
+
+
+    }
+
+    /**
      * 
      * @param key
      * @return
@@ -84,21 +95,24 @@ public class Config {
         }
 
     }
-
     /**
      *
      * @return
      */
-    public void dumpConfig(TracerDSTrace dstrace) {
-
-        Iterator it = configMap.entrySet().iterator();
-        Map.Entry pairs = null;
-
-        dstrace.traceMessage(" Extention config:");
-        while (it.hasNext()) {
-            pairs = (Map.Entry) it.next();
-            dstrace.traceMessage("   " + pairs.getKey() + " = " + pairs.getValue());
-        }
-
-    }
+//    public String dumpConfig(/*TracerDSTrace dstrace*/) {
+//
+//        Iterator it = configMap.entrySet().iterator();
+//        Map.Entry pairs = null;
+//        String confDump = "";
+//
+//        //dstrace.traceMessage(" Extention config:");
+//        while (it.hasNext()) {
+//            pairs = (Map.Entry) it.next();
+//            //dstrace.traceMessage("   " + pairs.getKey() + " = " + pairs.getValue());
+//            confDump += pairs.getKey() + " = " + pairs.getValue() + " ";
+//        }
+//
+//        return confDump;
+//    }
 }
+
