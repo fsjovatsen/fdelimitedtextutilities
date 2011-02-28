@@ -22,11 +22,16 @@ package net.sjovatsen.idm.drivers.ddt;
 import com.novell.nds.dirxml.driver.delimitedtext.*;
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import net.sjovatsen.delimitedtext.DTDeltaBuilder;
+import net.sjovatsen.delimitedtext.DTDeltaBuilderStats;
 import net.sjovatsen.delimitedtext.DTDuplicateKeyFinder;
-//import net.sjovatsen.delimitedtext.DTDeltaBuilder;
 import net.sjovatsen.delimitedtext.TRACE;
 import net.sjovatsen.idm.drivers.Config;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  *
@@ -38,20 +43,50 @@ public class PreProcessorExt implements PreProcessor {
     private TRACE trace = null;
     private Config config = null;
     private boolean allowDuplicates = false;
+    private int addThreshold = 0; //(config.get("addThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("addThreshold"));
+    private int deleteThreshold = 0; //(config.get("deleteThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("deleteThreshold"));
+    private int modifyThreshold = 0; //(config.get("modifyThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("modifyThreshold"));
+    private String backupDir = null;
+    private int key = 0;
+    private String delimiter = null;
+    private static final String VERSION = "1.2.0";
 
-    public void init(String parameterString, Tracer tracer) {
+    public void init(String parameterString, Tracer tracer) throws StatusException {
 
-        this.dstracer = new TracerDSTrace(tracer);
-        this.config = new Config(parameterString);
-        this.trace = traceTypeFromConfig(config.get("trace"));
-        this.allowDuplicates = new Boolean(config.get("dups")).booleanValue();
+        try {
+            this.dstracer = new TracerDSTrace(tracer);
+            this.config = new Config(parameterString);
+            this.trace = traceTypeFromConfig(config.get("trace"));
 
-        message("--- Loading PreProcessorExt ---");
-        message("Greetings from Frode Sjovatsen!");
-        message("DTDeltaBuilder version " + DTDeltaBuilder.version());
-        message("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
-        config.dumpConfig(dstracer);
-        message("--- End loading PreProcessorExt ---");
+            message("--- Loading PreProcessorExt ---");
+            message("Greetings from Frode Sjovatsen!");
+            message("fDTUtilsNIdm version " + this.version());
+            message("DTDeltaBuilder version " + DTDeltaBuilder.version());
+            message("DTDuplicateKeyFinder version " + DTDuplicateKeyFinder.version());
+            message("Extention config:");
+            message(" " + config.configString());
+
+            message("Validating config...");
+            this.addThreshold = (config.get("addThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("addThreshold"));
+            this.deleteThreshold = (config.get("deleteThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("deleteThreshold"));
+            this.modifyThreshold = (config.get("modifyThreshold").equals("na")) ? 0 : Integer.parseInt(config.get("modifyThreshold"));
+            this.key = (config.get("key").equals("na")) ? 0 : Integer.parseInt(config.get("key"));
+            //this.trace = traceTypeFromConfig(config.get("trace"));
+            this.allowDuplicates = (config.get("dups").toString().equals("true")) ? true : false; //new Boolean(config.get("dups")).booleanValue();
+            this.delimiter = config.get("delimiter");
+            this.backupDir = config.get("backupDir");
+            if (!verifyBackupDir(backupDir)) {
+                //message("backupDir does not exist, is not a directory or contains a trailing path seperator.");
+                throw new StatusException(StatusException.STATUS_FATAL, "backupDir (" + this.backupDir + ") does not exist, is not a directory or contains a trailing path seperator.");
+            }
+            message("Config seems ok!");
+
+            message("--- End loading PreProcessorExt ---");
+
+        } catch (NumberFormatException nfe) {
+            message("A config value was expected to be an integer, but was not.");
+            throw new StatusException(StatusException.STATUS_FATAL, nfe.getMessage());
+        }
     }
 
     public void nextInputFile(File inputFile) throws SkipFileException, StatusException {
@@ -61,16 +96,15 @@ public class PreProcessorExt implements PreProcessor {
         File ndFile = new File(inputFile.getPath() + ".NDF");
         File odFile = new File(inputFile.getPath() + ".ODF");
         File newODFile = new File(inputFile.getPath() + ".ODF");
-        File niFile = new File(inputFile.getPath() + ".NIF");
         DTDuplicateKeyFinder dupsFinder = new DTDuplicateKeyFinder();
         DTDeltaBuilder deltaBuilder = new DTDeltaBuilder();
-        //TracerDSTrace dstrace = new TracerDSTrace(tracer);
+        DTDeltaBuilderStats stats = null;
 
         message(" Determin if there is a corresponding ODF file?");
 
         try {
+            // Make ODF if not exists
             if (!odFile.exists()) {
-
                 message(" ODF file  do not exits (" + odFile.getPath() + ")");
                 message(" Assuming this is the first run for the driver. Creating a empty ODF. This will make all records marked with a add event");
                 odFile.createNewFile();
@@ -78,24 +112,32 @@ public class PreProcessorExt implements PreProcessor {
                 message(" ODF exits (" + odFile.getPath() + ")");
             }
 
+            // Make backup of new inputfile and current ODF.
+            backupInputAndODF(inputFile, odFile, backupDir);
+
+            // Make NDF
             message(" Copy inputFile to NDF (" + inputFile.getPath() + " ==> " + ndFile.getPath() + ").");
             copyFile(inputFile, ndFile);
-            //tracer.traceMessage(" Rename inputFile to NIF.");
-            //inputFile.renameTo(niFile);
 
             message(" All files are ready to be processed.");
 
+            // Check for duplicates
             dupsFinder.setFile(ndFile);
-            dupsFinder.setDelimiter(config.get("delimiter"));
-            dupsFinder.setKey(Integer.parseInt(config.get("key")));
+            dupsFinder.setDelimiter(this.delimiter);
+            dupsFinder.setKey(this.key);
             dupsFinder.setTracer(dstracer);
             dupsFinder.setTrace(trace);
             if (dupsFinder.hasDuplicateKeys()) {
                 dupsFinder.getDuplicateKeys();
                 if (!allowDuplicates) {
-                    throw new StatusException(StatusException.STATUS_WARNING, "The NDF contains duplicates.");
+                    message(" Found duplicates. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
+                    deleteFile(ndFile);
+                    deleteFile(inputFile);
+                    throw new StatusException(StatusException.STATUS_FATAL, "The NDF file contains duplicates.");
                 }
             }
+
+            // Building delta file.
             deltaBuilder.setNDF(ndFile);
             deltaBuilder.setODF(odFile);
             deltaBuilder.setNIF(inputFile);
@@ -103,40 +145,58 @@ public class PreProcessorExt implements PreProcessor {
             deltaBuilder.setKey(Integer.parseInt(config.get("key")));
             deltaBuilder.setTrace(trace);
             deltaBuilder.setTracer(dstracer);
-            deltaBuilder.buildDeltaFile();
+            stats = deltaBuilder.buildDeltaFile();
 
-//            message(" Copying NDF to ODF.");
-//            copyFile(ndFile, odFile);
-//            message(" Deleting NDF (" + ndFile.getPath() + ")");
-//            if (ndFile.delete()) {
-//                trace(" Delete NDF successede.");
-//            } else {
-//                trace(" Delete NDF failed.");
-//            }
-            message(" Deleting ODF (" + odFile.getPath() + ")");
-            if (odFile.delete()) {
-                trace(" Delete ODF successede.");
+            message(" Checking statistics...");
+            if (addThreshold > 0) {
+                stats.setAddThreshold(addThreshold);
+                if (stats.exceedsAddThreshold()) {
+                    message(" Add threshold exceeded. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
+                    deleteFile(ndFile);
+                    deleteFile(inputFile);
+                    throw new StatusException(StatusException.STATUS_FATAL, "The NDF file exceeds add treshold.");
+                }
             } else {
-                trace(" Delete ODF failed.");
+                message(" addThreshold is disabled.");
             }
+
+            if (deleteThreshold > 0) {
+                stats.setDeleteThreshold(deleteThreshold);
+                if (stats.exceedsDeleteThreshold()) {
+                    message(" Delete threshold exceeded. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
+                    deleteFile(ndFile);
+                    deleteFile(inputFile);
+                    throw new StatusException(StatusException.STATUS_FATAL, "The NDF file exceeds delete treshold.");
+                }
+            } else {
+                message(" deleteThreshold is disabled.");
+            }
+
+            if (modifyThreshold > 0) {
+                stats.setModifyThreshold(modifyThreshold);
+                if (stats.exceedsModifyThreshold()) {
+                    message(" Modify threshold exceeded. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
+                    deleteFile(ndFile);
+                    deleteFile(inputFile);
+                    throw new StatusException(StatusException.STATUS_FATAL, "The NDF file exceeds modify treshold.");
+                }
+            } else {
+                message(" modifyThreshold is disabled.");
+            }
+
+            // Making new ODF file
+            message(" Deleting ODF (" + odFile.getPath() + ")");
+            deleteFile(odFile);
 
             message(" Rename NDF to ODF (" + ndFile.getPath() + " ==> " + newODFile.getPath() + ")");
             if (ndFile.renameTo(newODFile)) {
-                trace(" Rename NDF to ODF success!");
+                message(" Rename NDF to ODF success!");
             } else {
-                trace(" Renamed NDF to ODF failed!");
+                message(" Renamed NDF to ODF failed!");
             }
             message("--- End executing PreProcessorExt.nextInputFile() ---");
 
         } catch (IOException e) {
-        } catch (StatusException e) {
-            message(" Found duplicates. Keeping the old ODF and deleting the NDF (" + ndFile.getPath() + ")");
-            if (ndFile.delete()) {
-                trace(" Delete NDF successede.");
-            } else {
-                trace(" Delete NDF failed.");
-            }
-            throw new SkipFileException();
         } finally {
         }
 
@@ -181,6 +241,87 @@ public class PreProcessorExt implements PreProcessor {
         }
     }
 
+    private void backupInputAndODF(File inputFile, File odFile, String backupDir) {
+
+        Date now = new Date();
+        int len;
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String[] filesToZip = new String[2];
+        String[] fileNamesToZip = new String[2];
+
+        filesToZip[0] = inputFile.getPath();
+        filesToZip[1] = odFile.getPath();
+        fileNamesToZip[0] = inputFile.getName();
+        fileNamesToZip[1] = odFile.getName();
+
+        String zipFileName = backupDir + File.separator + fileNamesToZip[0] + "-" + format.format(now) + ".zip";
+
+        message(" Make backup of current ODF and new inputfile. Backuparchive is " + zipFileName);
+
+        byte[] buffer = new byte[18024];
+
+        try {
+
+            ZipOutputStream out =
+                    new ZipOutputStream(new FileOutputStream(zipFileName));
+
+            // Set the compression ratio
+            out.setLevel(Deflater.BEST_COMPRESSION);
+
+            // Adding each file to the zip file
+            for (int i = 0; i < filesToZip.length; i++) {
+                message(" Adding " + filesToZip[i] + " (" + fileNamesToZip[i] + ") to the backup archive.");
+                FileInputStream in = new FileInputStream(filesToZip[i]);
+                out.putNextEntry(new ZipEntry(fileNamesToZip[i]));
+
+                while ((len = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, len);
+                }
+
+                out.closeEntry();
+                in.close();
+            }
+
+            out.close();
+
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+        } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    private void deleteFile(File file) {
+        if (file.delete()) {
+            message(" Delete " + file.getPath() + " successede.");
+        } else {
+            message(" Delete " + file.getPath() + " failed.");
+        }
+    }
+
+    private boolean verifyBackupDir(String backupDir) {
+
+        File file = new File(backupDir);
+
+        if (backupDir.equals("na")) {
+            message("Backup is disabled.");
+            return true;
+        }
+
+        if (backupDir.endsWith(File.separator)) {
+            message("backupDir ends with a path seperator.");
+            return false;
+        }
+
+        if (!file.isDirectory()) {
+            return false;
+        }
+
+        return true;
+    }
+
     private TRACE traceTypeFromConfig(String s) {
 
         if (s.equals("verbose")) {
@@ -191,5 +332,13 @@ public class PreProcessorExt implements PreProcessor {
             return TRACE.DEFAULT;
         }
 
+    }
+
+    /**
+     * Returns class version
+     * @return <code>VERSION</code>
+     */
+    public String version() {
+        return VERSION;
     }
 }
