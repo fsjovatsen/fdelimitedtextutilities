@@ -49,7 +49,7 @@ public class DTDeltaBuilder extends DTAbstract {
 //    private static final String DEFAULT_DELIMITER = ",";
 //    private static final int DEFAULT_KEY = 0;
 //    private static final int DEFAULT_ROWCOUNT = 0;
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = "1.1.0";
 
     /**
      * Class constructor.
@@ -112,7 +112,7 @@ public class DTDeltaBuilder extends DTAbstract {
      * If a record is in ODF, but not in NDF, the record is marked as DELETE 
      * and pushed to NIF.
      */
-    public void buildDeltaFile() {
+    public DTDeltaBuilderStats buildDeltaFile() {
 
         try {
             BufferedReader ndfFile = new BufferedReader(new FileReader(ndFile));
@@ -120,6 +120,7 @@ public class DTDeltaBuilder extends DTAbstract {
             PrintWriter nifFile = new PrintWriter(new FileWriter(niFile));
             ArrayList<String> odfArrayList = new ArrayList<String>();
             ArrayList<String> ndfArrayList = new ArrayList<String>();
+            DTDeltaBuilderStats stats = new DTDeltaBuilderStats();
             String ndfLine = null;
             String[] ndfLineArray = null;
             String odfLine = null;
@@ -247,10 +248,20 @@ public class DTDeltaBuilder extends DTAbstract {
             message(" DELETE count = " + iDELETECount);
             message("--------------------------------------------------");
 
+
+            stats.setOdfCount(iODFCount);
+            stats.setNdfCount(iNDFCount);
+            stats.setNifCount(iNIFCount);
+            stats.setModifyEvents(iMODIFYCount);
+            stats.setAddEvents(iADDCount);
+            stats.setDeleteEvents(iDELETECount);
+            
             /*
              * Clean up
              */
             nifFile.close();
+
+            return stats;
 
 
         } catch (FileNotFoundException e) {
@@ -260,6 +271,7 @@ public class DTDeltaBuilder extends DTAbstract {
         } catch (ArrayIndexOutOfBoundsException e) {
             trace("Array index out of bounds (" + e.toString() + ").");
         }
+        return null;
     }
 
     /**
